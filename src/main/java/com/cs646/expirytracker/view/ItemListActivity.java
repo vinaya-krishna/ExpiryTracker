@@ -33,7 +33,7 @@ public class ItemListActivity extends AppCompatActivity {
         buttonAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ItemListActivity.this,AddItemActivity.class);
+                Intent intent = new Intent(ItemListActivity.this,EditItemActivity.class);
                 startActivityForResult(intent, ADD_ITEM_REQ);
             }
         });
