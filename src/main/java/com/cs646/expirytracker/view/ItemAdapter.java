@@ -39,13 +39,12 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
         holder.textViewName.setText(trackItem.getName());
         String date_n = Helper.getStringFromDate(trackItem.getDateExpiry());
 
-        Date todayDate = new Date();
-        long diff = trackItem.getDateExpiry().getTime() - todayDate.getTime();
-        float days = (diff / (1000*60*60*24));
+
+        int num_of_days = Helper.getNumberofDays(new Date(), trackItem.getDateExpiry());
 
         holder.textViewDate.setText(date_n);
 
-        holder.textViewReaminingDays.setText((int)days + " days remaining");
+        holder.textViewReaminingDays.setText((num_of_days + " days remaining"));
 
     }
 
@@ -61,9 +60,14 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
         notifyDataSetChanged();
     }
 
-    public void setmOnItemListener(OnItemListener onItemListener){
+    public void setOnItemListener(OnItemListener onItemListener){
         mOnItemListener = onItemListener;
     }
+
+    public TrackItem getTrackItemAt(int position){
+        return items.get(position);
+    }
+
 
 
     class ItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -83,7 +87,9 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
 
         @Override
         public void onClick(View v) {
-            onItemListener.onItemClick(getAdapterPosition());
+            int position = getAdapterPosition();
+            if(onItemListener != null && position != RecyclerView.NO_POSITION)
+                onItemListener.onItemClick(position);
         }
     }
 

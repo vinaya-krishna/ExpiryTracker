@@ -20,7 +20,6 @@ public class TrackItemViewModel extends AndroidViewModel {
     public TrackItemViewModel(@NonNull Application application) {
         super(application);
         trackItemRepo = new TrackItemRepo(application);
-        allTrackItems = trackItemRepo.getAllTrackItems();
     }
 
     public void insertItem(TrackItem trackItem){
@@ -34,6 +33,7 @@ public class TrackItemViewModel extends AndroidViewModel {
     }
 
     public LiveData<List<TrackItem>> getAllItems(){
+        allTrackItems = trackItemRepo.getAllTrackItems();
         return allTrackItems;
     }
 
