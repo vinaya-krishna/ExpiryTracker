@@ -7,17 +7,18 @@ import android.os.Bundle;
 
 import com.cs646.expirytracker.R;
 
-public class EditItemActivity extends AppCompatActivity {
+public class ViewItemActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_item);
+        setContentView(R.layout.activity_view_item);
+
 
         Toolbar toolbar = findViewById(R.id.view_toolbar);
         setSupportActionBar(toolbar);
 
-        if(getSupportActionBar() != null)
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
+
+
 }

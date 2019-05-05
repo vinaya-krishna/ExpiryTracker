@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.EditItemActivity">
+    tools:context=".view.ViewItemActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/view_app_bar_layout"
@@ -188,6 +188,7 @@
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_edit_item"
         android:src="@drawable/ic_edit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

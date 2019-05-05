@@ -20,6 +20,7 @@ import java.util.Locale;
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
 
     private List<TrackItem> items = new ArrayList<>();
+    private OnItemListener mOnItemListener;
 
 
     @NonNull
@@ -28,7 +29,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
 
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.track_item, parent, false);
-        return new ItemHolder(itemView);
+        return new ItemHolder(itemView, mOnItemListener);
     }
 
     @Override
@@ -55,22 +56,39 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
 
     public void setItems(List<TrackItem> trackItems){
         this.items = trackItems;
-        //change later
+        //TODO change later
         notifyDataSetChanged();
     }
 
+    public void setmOnItemListener(OnItemListener onItemListener){
+        mOnItemListener = onItemListener;
+    }
 
 
-    class ItemHolder extends RecyclerView.ViewHolder{
+    class ItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private TextView textViewName;
         private TextView textViewDate;
         private TextView textViewReaminingDays;
+        private OnItemListener onItemListener;
 
-        public ItemHolder(@NonNull View itemView) {
+        public ItemHolder(@NonNull View itemView, OnItemListener onItemListener) {
             super(itemView);
+            this.onItemListener = onItemListener;
             textViewName = itemView.findViewById(R.id.item_name);
             textViewDate = itemView.findViewById(R.id.item_expiry_date);
             textViewReaminingDays = itemView.findViewById(R.id.item_days_remain);
+            itemView.setOnClickListener(this);
+        }
+
+        @Override
+        public void onClick(View v) {
+            onItemListener.onItemClick(getAdapterPosition());
         }
     }
+
+    public interface OnItemListener{
+        void onItemClick(int position);
+    }
+
+
 }

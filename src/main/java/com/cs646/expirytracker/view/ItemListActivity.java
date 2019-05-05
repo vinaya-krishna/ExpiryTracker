@@ -18,7 +18,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
-public class ItemListActivity extends AppCompatActivity {
+public class ItemListActivity extends AppCompatActivity implements ItemAdapter.OnItemListener {
 
     public static final int ADD_ITEM_REQ = 1;
 
@@ -33,7 +33,7 @@ public class ItemListActivity extends AppCompatActivity {
         buttonAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ItemListActivity.this,EditItemActivity.class);
+                Intent intent = new Intent(ItemListActivity.this, AddItemActivity.class);
                 startActivityForResult(intent, ADD_ITEM_REQ);
             }
         });
@@ -44,6 +44,7 @@ public class ItemListActivity extends AppCompatActivity {
         recyclerView.setHasFixedSize(true);
 
         final ItemAdapter itemAdapter = new ItemAdapter();
+        itemAdapter.setmOnItemListener(this);
         recyclerView.setAdapter(itemAdapter);
 
         trackItemViewModel = ViewModelProviders.of(this).get(TrackItemViewModel.class);
@@ -60,7 +61,14 @@ public class ItemListActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if(requestCode == ADD_ITEM_REQ && resultCode == RESULT_OK){
-            //do something get data
+            //TODO do something get data
         }
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        Intent intent = new Intent(ItemListActivity.this, ViewItemActivity.class);
+        //TODO pass the object to this activity
+        startActivity(intent);
     }
 }
