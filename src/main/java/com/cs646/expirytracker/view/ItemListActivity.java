@@ -19,7 +19,6 @@ import com.cs646.expirytracker.helper.Helper;
 import com.cs646.expirytracker.viewmodel.TrackItemViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.Date;
 import java.util.List;
 
 public class ItemListActivity extends AppCompatActivity {
@@ -37,7 +36,7 @@ public class ItemListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ItemListActivity.this, EditItemActivity.class);
-                startActivityForResult(intent, Helper.ADD_ITEM_REQ);
+                startActivityForResult(intent, Helper.REQUEST_ADD_ITEM);
             }
         });
 
@@ -95,7 +94,7 @@ public class ItemListActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == Helper.ADD_ITEM_REQ && resultCode == RESULT_OK){
+        if(requestCode == Helper.REQUEST_ADD_ITEM && resultCode == RESULT_OK){
             TrackItem trackItem = data.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
             trackItemViewModel.insertItem(trackItem);
         }

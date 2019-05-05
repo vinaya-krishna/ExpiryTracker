@@ -25,7 +25,8 @@
             <ImageView
                 android:id="@+id/view_item_photo"
                 app:layout_collapseMode="parallax"
-                android:src="@drawable/firework"
+                android:src="@drawable/ic_image_placeholder"
+                android:background="@color/darkGray"
                 android:contentDescription="@string/app_name"
                 android:scaleType="centerCrop"
                 android:layout_width="match_parent"

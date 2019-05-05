@@ -29,13 +29,24 @@ public class TrackItem implements Parcelable {
 
     private int itemCount;
 
+    private String itemImagePath;
 
-    public TrackItem(String name, Date dateCreation, Date dateExpiry, int itemCount) {
+    public TrackItem(String name, Date dateCreation, Date dateExpiry, int itemCount, String itemImagePath) {
         this.name = name;
         this.dateCreation = dateCreation;
         this.dateExpiry = dateExpiry;
         this.itemCount = itemCount;
+        this.itemImagePath = itemImagePath;
     }
+
+    public String getItemImagePath() {
+        return itemImagePath;
+    }
+
+    public void setItemImagePath(String itemImagePath) {
+        this.itemImagePath = itemImagePath;
+    }
+
 
     protected TrackItem(Parcel in) {
         id = in.readInt();
@@ -43,6 +54,7 @@ public class TrackItem implements Parcelable {
         itemCount = in.readInt();
         dateCreation = new Date(in.readLong());
         dateExpiry = new Date(in.readLong());
+        itemImagePath = in.readString();
     }
 
     public static final Creator<TrackItem> CREATOR = new Creator<TrackItem>() {
@@ -109,5 +121,6 @@ public class TrackItem implements Parcelable {
         dest.writeInt(itemCount);
         dest.writeLong(dateCreation.getTime());
         dest.writeLong(dateExpiry.getTime());
+        dest.writeString(itemImagePath);
     }
 }

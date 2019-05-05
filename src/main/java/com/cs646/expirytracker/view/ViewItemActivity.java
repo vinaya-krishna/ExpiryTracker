@@ -8,8 +8,11 @@ import androidx.lifecycle.ViewModelProviders;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.cs646.expirytracker.R;
 import com.cs646.expirytracker.database.TrackItem;
 import com.cs646.expirytracker.helper.Helper;
@@ -17,6 +20,7 @@ import com.cs646.expirytracker.viewmodel.TrackItemViewModel;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.io.File;
 import java.util.Date;
 
 public class ViewItemActivity extends AppCompatActivity {
@@ -24,6 +28,7 @@ public class ViewItemActivity extends AppCompatActivity {
     TextView itemCount, itemAddedOn, itemExpiryOn, itemDaysLeft;
     Toolbar toolbar;
     TrackItem trackItem;
+    ImageView viewItemPhoto;
     private TrackItemViewModel trackItemViewModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +46,7 @@ public class ViewItemActivity extends AppCompatActivity {
         itemAddedOn = findViewById(R.id.view_add_date);
         itemExpiryOn = findViewById(R.id.view_expiry_date);
         itemDaysLeft = findViewById(R.id.view_days_left);
+        viewItemPhoto = findViewById(R.id.view_item_photo);
 
         updateView(trackItem);
 
@@ -50,13 +56,14 @@ public class ViewItemActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent editIntent = new Intent(ViewItemActivity.this, EditItemActivity.class);
                 editIntent.putExtra(Helper.EXTRA_TRACK_ITEM,trackItem);
-                startActivityForResult(editIntent, Helper.EDIT_ITEM_REQ);
+                startActivityForResult(editIntent, Helper.REQUEST_EDIT_ITEM);
             }
         });
 
     }
 
     private void updateView(TrackItem trackItem){
+        Glide.with(ViewItemActivity.this).load(new File(trackItem.getItemImagePath())).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(viewItemPhoto);
         itemCount.setText(""+trackItem.getItemCount());
         CollapsingToolbarLayout toolbar = findViewById(R.id.view_collapsing_toolbar);
         toolbar.setTitle(trackItem.getName());
@@ -71,7 +78,7 @@ public class ViewItemActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode == Helper.EDIT_ITEM_REQ && resultCode == RESULT_OK){
+        if(requestCode == Helper.REQUEST_EDIT_ITEM && resultCode == RESULT_OK){
             trackItem = data.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
             //Update the view
             trackItemViewModel.updateItem(trackItem);
