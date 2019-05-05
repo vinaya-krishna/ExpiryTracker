@@ -95,29 +95,11 @@ public class ItemListActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-
-
         if(requestCode == Helper.ADD_ITEM_REQ && resultCode == RESULT_OK){
-            TrackItem trackItem = new TrackItem(data.getStringExtra(Helper.EXTRA_ITEM_NAME),
-                                                new Date(),
-                                                Helper.getDateFromString(data.getStringExtra(Helper.EXTRA_ITEM_DATE)),
-                                                Integer.parseInt(data.getStringExtra(Helper.EXTRA_ITEM_COUNT))
-                                                );
+            TrackItem trackItem = data.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
             trackItemViewModel.insertItem(trackItem);
-            Helper.showMessage(this, "Item Saved!");
         }
-        else {
-            Helper.showMessage(this, "Item not Saved!");
-        }
+
     }
-//
-//    @Override
-//    public void onItemClick(int position) {
-//        Intent intent = new Intent(ItemListActivity.this, ViewItemActivity.class);
-//        //TODO pass the object to this activity
-//        intent.putExtra("ExampleItem",item.getTrackItemAt(viewHolder.getAdapterPosition()))
-//        startActivity(intent);
-//    }
 
 }

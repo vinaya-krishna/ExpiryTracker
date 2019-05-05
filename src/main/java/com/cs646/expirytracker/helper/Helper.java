@@ -46,13 +46,15 @@ public class Helper {
         return (int)(days);
     }
 
-    //Todo Update intents both Edit and Add new
-    //Todo Update view after update item
+
     //Todo camera integration, save, update database
     //Todo Add calender input
+    //Todo camera storage, link update/path
     //Todo add remainder : update view , database, set notification
     //Todo Speech input
     //Todo Update view in list view circular thing and date style
     //Todo different colors for the theme
+    //Todo icon for app
+    //Todo icon Inside tool bar
 
 }

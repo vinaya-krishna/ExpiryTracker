@@ -12,11 +12,9 @@ import com.cs646.expirytracker.R;
 import com.cs646.expirytracker.database.TrackItem;
 import com.cs646.expirytracker.helper.Helper;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
 

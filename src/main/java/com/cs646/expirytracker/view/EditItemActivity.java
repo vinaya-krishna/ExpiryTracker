@@ -2,21 +2,19 @@ package com.cs646.expirytracker.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.ViewModelProviders;
-import androidx.lifecycle.ViewModelStoreOwner;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.cs646.expirytracker.R;
 import com.cs646.expirytracker.database.TrackItem;
 import com.cs646.expirytracker.helper.Helper;
-import com.cs646.expirytracker.viewmodel.TrackItemViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.Date;
 
 public class EditItemActivity extends AppCompatActivity {
 
@@ -24,7 +22,6 @@ public class EditItemActivity extends AppCompatActivity {
     private EditText mItemCount;
     private TextView mItemExpiryDate;
     private FloatingActionButton mSaveItem;
-    private TrackItemViewModel trackItemViewModel;
     private boolean EDIT_MODE = true;
 
     @Override
@@ -34,14 +31,10 @@ public class EditItemActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.edit_toolbar);
         setSupportActionBar(toolbar);
 
-        trackItemViewModel = ViewModelProviders.of(this).get(TrackItemViewModel.class);
-
         mItemName = findViewById(R.id.edit_item_name);
         mItemCount = findViewById(R.id.edit_item_count);
         mItemExpiryDate = findViewById(R.id.edit_item_expiry_date);
         mSaveItem = findViewById(R.id.button_save_item);
-
-
 
         Intent intent = getIntent();
         final TrackItem trackItem = intent.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
@@ -56,8 +49,6 @@ public class EditItemActivity extends AppCompatActivity {
             toolbar.setTitle("Add Item");
             EDIT_MODE = false;
         }
-
-
 
 
         mSaveItem.setOnClickListener(new View.OnClickListener() {
@@ -81,20 +72,23 @@ public class EditItemActivity extends AppCompatActivity {
             return;
         }
 
+        Intent data = new Intent();
+        TrackItem updatedTrackItem;
         if(EDIT_MODE){
-            TrackItem updatedTrackItem = getIntent().getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
+            updatedTrackItem = getIntent().getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
             updatedTrackItem.setName(itemName);
             updatedTrackItem.setDateExpiry(Helper.getDateFromString(itemExpiryDate));
             updatedTrackItem.setItemCount(Integer.parseInt(itemCount));
-            trackItemViewModel.updateItem(updatedTrackItem);
         }
-        else {
-            Intent data = new Intent();
-            data.putExtra(Helper.EXTRA_ITEM_NAME,itemName);
-            data.putExtra(Helper.EXTRA_ITEM_COUNT,itemCount);
-            data.putExtra(Helper.EXTRA_ITEM_DATE,itemExpiryDate);
-            setResult(RESULT_OK, data);
+        else{
+            updatedTrackItem = new TrackItem(itemName, new Date(),
+                                            Helper.getDateFromString(itemExpiryDate),
+                                            Integer.parseInt(itemCount));
+
         }
+
+        data.putExtra(Helper.EXTRA_TRACK_ITEM,updatedTrackItem);
+        setResult(RESULT_OK, data);
         finish();
     }
 }
