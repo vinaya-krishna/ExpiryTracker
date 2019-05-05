@@ -11,9 +11,10 @@
         android:theme="@style/AppTheme">
         <activity android:name=".view.ViewItemActivity"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".view.AddItemActivity"
+        <activity android:name=".view.EditItemActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".view.ItemListActivity">
+        <activity android:name=".view.ItemListActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

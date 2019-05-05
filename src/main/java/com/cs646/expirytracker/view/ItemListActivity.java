@@ -13,9 +13,11 @@ import android.view.View;
 
 import com.cs646.expirytracker.R;
 import com.cs646.expirytracker.database.TrackItem;
+import com.cs646.expirytracker.helper.Helper;
 import com.cs646.expirytracker.viewmodel.TrackItemViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.Date;
 import java.util.List;
 
 public class ItemListActivity extends AppCompatActivity implements ItemAdapter.OnItemListener {
@@ -33,7 +35,7 @@ public class ItemListActivity extends AppCompatActivity implements ItemAdapter.O
         buttonAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(ItemListActivity.this, AddItemActivity.class);
+                Intent intent = new Intent(ItemListActivity.this, EditItemActivity.class);
                 startActivityForResult(intent, ADD_ITEM_REQ);
             }
         });
@@ -60,8 +62,19 @@ public class ItemListActivity extends AppCompatActivity implements ItemAdapter.O
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+
+
         if(requestCode == ADD_ITEM_REQ && resultCode == RESULT_OK){
-            //TODO do something get data
+            TrackItem trackItem = new TrackItem(data.getStringExtra(EditItemActivity.EXTRA_ITEM_NAME),
+                                                new Date(),
+                                                Helper.getDateFromString(data.getStringExtra(EditItemActivity.EXTRA_ITEM_DATE)),
+                                                Integer.parseInt(data.getStringExtra(EditItemActivity.EXTRA_ITEM_COUNT))
+                                                );
+            trackItemViewModel.insertItem(trackItem);
+            Helper.showMessage(this, "Item Saved!");
+        }
+        else {
+            Helper.showMessage(this, "Item not Saved!");
         }
     }
 

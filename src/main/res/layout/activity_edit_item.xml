@@ -5,10 +5,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.AddItemActivity">
+    tools:context=".view.EditItemActivity">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/add_app_bar_layout"
+        android:id="@+id/edit_app_bar_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
@@ -23,7 +23,7 @@
             android:fitsSystemWindows="true">
 
             <ImageView
-                android:id="@+id/add_item_photo"
+                android:id="@+id/edit_item_photo"
                 app:layout_collapseMode="parallax"
                 android:src="@drawable/firework"
                 android:contentDescription="@string/app_name"
@@ -32,7 +32,7 @@
                 android:layout_height="350dp" />
 
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/add_toolbar"
+                android:id="@+id/edit_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
@@ -73,6 +73,7 @@
                         android:layout_marginTop="12dp"
                         android:text="Name : " />
                     <EditText
+                        android:id="@+id/edit_item_name"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="12dp"
@@ -102,6 +103,7 @@
                         android:layout_marginTop="12dp"
                         android:text="Count : " />
                     <EditText
+                        android:id="@+id/edit_item_count"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="12dp"
@@ -131,6 +133,7 @@
                         android:layout_marginTop="12dp"
                         android:text="Expiry Date : " />
                     <TextView
+                        android:id="@+id/edit_item_expiry_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="12dp"
@@ -161,7 +164,7 @@
         android:elevation="6dp"
         app:pressedTranslationZ="12dp"
         android:layout_margin="16dp"
-        app:layout_anchor = "@id/add_app_bar_layout"
+        app:layout_anchor = "@id/edit_app_bar_layout"
         app:layout_anchorGravity="bottom|right|end"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.cs646.expirytracker.R;
 import com.cs646.expirytracker.database.TrackItem;
+import com.cs646.expirytracker.helper.Helper;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -36,7 +37,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
     public void onBindViewHolder(@NonNull ItemHolder holder, int position) {
         TrackItem trackItem = items.get(position);
         holder.textViewName.setText(trackItem.getName());
-        String date_n = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault()).format(trackItem.getDateExpiry());
+        String date_n = Helper.getStringFromDate(trackItem.getDateExpiry());
 
         Date todayDate = new Date();
         long diff = trackItem.getDateExpiry().getTime() - todayDate.getTime();
