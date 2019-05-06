@@ -63,7 +63,7 @@ public class ViewItemActivity extends AppCompatActivity {
     }
 
     private void updateView(TrackItem trackItem){
-        Glide.with(ViewItemActivity.this).load(new File(trackItem.getItemImagePath())).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(viewItemPhoto);
+        Glide.with(this).load(new File(trackItem.getItemImagePath())).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(viewItemPhoto);
         itemCount.setText(""+trackItem.getItemCount());
         CollapsingToolbarLayout toolbar = findViewById(R.id.view_collapsing_toolbar);
         toolbar.setTitle(trackItem.getName());

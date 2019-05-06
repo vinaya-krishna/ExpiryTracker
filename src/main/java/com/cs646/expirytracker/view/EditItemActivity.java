@@ -7,6 +7,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
 
 import android.Manifest;
+import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -18,6 +19,7 @@ import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -42,6 +44,7 @@ import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import java.text.SimpleDateFormat;
 import java.io.File;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -55,6 +58,8 @@ public class EditItemActivity extends AppCompatActivity {
     private boolean EDIT_MODE = true;
     private FileCompressor mCompressor;
     private ImageView itemImage;
+    private Calendar calendar;
+    DatePickerDialog datePickerDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,6 +99,27 @@ public class EditItemActivity extends AppCompatActivity {
             }
         });
 
+        mItemExpiryDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calendar = Calendar.getInstance();
+                final int day = calendar.get(Calendar.DAY_OF_MONTH);
+                final int month = calendar.get(Calendar.MONTH);
+                final int year = calendar.get(Calendar.YEAR);
+
+                datePickerDialog = new DatePickerDialog(EditItemActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int mYear, int mMonth, int mDay) {
+                        calendar.set(mYear, mMonth, mDay);
+                        mItemExpiryDate.setText(Helper.getStringFromDate(calendar.getTime()));
+                    }
+
+                }, year,month,day);
+
+                datePickerDialog.show();
+            }
+        });
+
 
 
     }
@@ -116,6 +142,7 @@ public class EditItemActivity extends AppCompatActivity {
             updatedTrackItem.setName(itemName);
             updatedTrackItem.setDateExpiry(Helper.getDateFromString(itemExpiryDate));
             updatedTrackItem.setItemCount(Integer.parseInt(itemCount));
+            updatedTrackItem.setItemImagePath(mPhotoFile.toString());
         }
         else{
             updatedTrackItem = new TrackItem(itemName, new Date(),

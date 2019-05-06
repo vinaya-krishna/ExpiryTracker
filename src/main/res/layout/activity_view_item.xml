@@ -83,7 +83,6 @@
                         android:textSize="20sp"
                         android:layout_weight="0.75"
                         android:layout_marginTop="12dp"
-                        android:text="5"
 
                         />
                 </LinearLayout>
@@ -113,7 +112,6 @@
                         android:textSize="20sp"
                         android:layout_weight="0.75"
                         android:layout_marginTop="12dp"
-                        android:text="1"
 
                         />
                 </LinearLayout>
@@ -143,7 +141,6 @@
                         android:textSize="20sp"
                         android:layout_weight="0.75"
                         android:layout_marginTop="12dp"
-                        android:text="May 1, 2019"
 
                         />
                 </LinearLayout>
@@ -173,7 +170,6 @@
                         android:textSize="20sp"
                         android:layout_weight="0.75"
                         android:layout_marginTop="12dp"
-                        android:text="May 15, 2019"
 
                         />
                 </LinearLayout>
