@@ -93,36 +93,6 @@
                     android:layout_height="2dp"
                     android:background="#c0c0c0"/>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="12dp"
-                        android:textSize="20sp"
-                        android:layout_weight="1"
-                        android:layout_marginTop="12dp"
-                        android:text="Count : " />
-                    <EditText
-                        android:id="@+id/edit_item_count"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="12dp"
-                        android:textSize="20sp"
-                        android:layout_weight="0.75"
-                        android:layout_marginTop="12dp"
-                        android:hint="Number of Item"
-                        android:text="1"
-
-                        />
-                </LinearLayout>
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:background="#c0c0c0"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"

@@ -26,10 +26,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
@@ -49,19 +51,30 @@ import com.karumi.dexter.listener.DexterError;
 import com.karumi.dexter.listener.PermissionRequestErrorListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.io.File;
 import java.io.IOException;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 public class EditItemActivity extends AppCompatActivity {
 
     File mPhotoFile;
     private EditText mItemName;
-    private EditText mItemCount;
     private TextView mItemExpiryDate;
     private FloatingActionButton mAddPhoto;
     private boolean EDIT_MODE = true;
@@ -86,7 +99,6 @@ public class EditItemActivity extends AppCompatActivity {
         notificationScheduler = new NotificationScheduler(this, ViewItemActivity.class);
 
         mItemName = findViewById(R.id.edit_item_name);
-        mItemCount = findViewById(R.id.edit_item_count);
         mItemExpiryDate = findViewById(R.id.edit_item_expiry_date);
         mAddPhoto = findViewById(R.id.button_add_photo);
         itemImage = findViewById(R.id.edit_item_photo);
@@ -100,7 +112,6 @@ public class EditItemActivity extends AppCompatActivity {
             collapsingToolbarLayout.setTitle("Edit Item");
             EDIT_MODE = true;
             mItemName.setText(trackItem.getName());
-            mItemCount.setText(""+trackItem.getItemCount());
             mItemExpiryDate.setText(Helper.getStringFromDate(trackItem.getDateExpiry()));
             Glide.with(this).load(new File(trackItem.getItemImagePath())).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(itemImage);
         }else{
@@ -178,7 +189,7 @@ public class EditItemActivity extends AppCompatActivity {
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Say something");
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Say something \\n Eg: Tomorrow / Day after tomorrow / 21st May / Next month 22nd");
         try {
             startActivityForResult(intent, Helper.REQUEST_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
@@ -186,14 +197,12 @@ public class EditItemActivity extends AppCompatActivity {
         }
     }
 
-
     private void saveItem(){
         String itemName = mItemName.getText().toString().trim();
-        String itemCount = mItemCount.getText().toString().trim();
         String itemExpiryDate = mItemExpiryDate.getText().toString().trim();
         String itemReminderDate = mItemReminder.getText().toString().trim();
 
-        if(itemName.isEmpty() || itemCount.isEmpty() || itemExpiryDate.isEmpty() || itemReminderDate.isEmpty()){
+        if(itemName.isEmpty() || itemExpiryDate.isEmpty() || itemReminderDate.isEmpty()){
             Helper.showMessage(this, "Please Enter All details");
             return;
         }
@@ -205,7 +214,6 @@ public class EditItemActivity extends AppCompatActivity {
             updatedTrackItem = getIntent().getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
             updatedTrackItem.setName(itemName);
             updatedTrackItem.setDateExpiry(Helper.getDateFromString(itemExpiryDate));
-            updatedTrackItem.setItemCount(Integer.parseInt(itemCount));
             updatedTrackItem.setItemImagePath(mPhotoFile.toString());
         }
         else{
@@ -216,7 +224,7 @@ public class EditItemActivity extends AppCompatActivity {
             updatedTrackItem = new TrackItem(itemName, new Date(),
                                             Helper.getDateFromString(itemExpiryDate),
                                             Helper.getDateFromString(itemReminderDate),
-                                            Integer.parseInt(itemCount),
+                                            Integer.parseInt("1"),
                                             mPhotoFile.toString());
 
 
@@ -269,8 +277,6 @@ public class EditItemActivity extends AppCompatActivity {
 
         builder.show();
     }
-
-
 
     /**
      * Requesting multiple permissions (storage and camera) at once
@@ -335,7 +341,6 @@ public class EditItemActivity extends AppCompatActivity {
 
     }
 
-    // navigating user to app settings
     private void openSettings() {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         Uri uri = Uri.fromParts("package", getPackageName(), null);
@@ -411,53 +416,107 @@ public class EditItemActivity extends AppCompatActivity {
 
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable final Intent data) {
         if (resultCode == RESULT_OK) {
-            if (requestCode == Helper.REQUEST_TAKE_PHOTO) {
-                try {
-                    mPhotoFile = mCompressor.compressToFile(mPhotoFile);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Glide.with(EditItemActivity.this).load(mPhotoFile).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(itemImage);
-            } else if (requestCode == Helper.REQUEST_GALLERY_PHOTO) {
-                Uri selectedImage = data.getData();
-                try {
-                    mPhotoFile = mCompressor.compressToFile(new File(getRealPathFromUri(selectedImage)));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                Glide.with(EditItemActivity.this).load(mPhotoFile).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(itemImage);
+
+            switch (requestCode) {
+                case Helper.REQUEST_TAKE_PHOTO:
+
+                    try {
+                        mPhotoFile = mCompressor.compressToFile(mPhotoFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Glide.with(EditItemActivity.this).
+                            load(mPhotoFile).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(itemImage);
+
+                    break;
+                case Helper.REQUEST_GALLERY_PHOTO:
+
+                    Uri selectedImage = data.getData();
+                    try {
+                        mPhotoFile = mCompressor.compressToFile(new File(getRealPathFromUri(selectedImage)));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    Glide.with(EditItemActivity.this).
+                            load(mPhotoFile).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(itemImage);
+
+                    break;
+
+                case Helper.REQUEST_SPEECH_INPUT:
+
+                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+
+                    String query = result.get(0);
+                    query = query.replaceAll("\\s", "%20");
+
+                    String url = "https://api.wit.ai/message?v=20190508&q=" + query;
+                    RequestQueue queue = Volley.newRequestQueue(this);
+
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                            new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+                                    try {
+
+                                        JSONObject valuesObj = response.getJSONObject("entities").
+                                                getJSONArray("datetime").
+                                                getJSONObject(0).getJSONArray("values")
+                                                .getJSONObject(0);
+
+                                        if (valuesObj.getString("type").equals("value")) {
+                                            String value = valuesObj.getString("value");
+
+                                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                                            try {
+                                                Date date = dateFormat.parse(value);
+                                                mItemExpiryDate.setText(Helper.getStringFromDate(date));
+
+
+                                            } catch (ParseException e) {
+                                                Helper.showMessage(EditItemActivity.this, e.getMessage());
+                                            }
+
+
+                                        } else if (valuesObj.getString("type").equals("interval")) {
+                                            String value = valuesObj.getJSONObject("from").getString("value");
+
+
+                                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                                            try {
+
+                                                Date date = dateFormat.parse(value);
+                                                mItemExpiryDate.setText(Helper.getStringFromDate(date));
+
+                                            } catch (ParseException e) {
+                                                Helper.showMessage(EditItemActivity.this, e.getMessage());
+                                            }
+
+                                        }
+
+                                    } catch (JSONException e) {
+                                        Helper.showMessage(EditItemActivity.this, "Not Recognised");
+                                    }
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            Helper.showMessage(EditItemActivity.this, error.getMessage());
+                        }
+                    }) {
+                        @Override
+                        public Map<String, String> getHeaders() throws AuthFailureError {
+                            Map<String, String> params = new HashMap<>();
+                            params.put("Authorization", "Bearer GHT67LFYOCSXTP6A4Q6REO5X4QACJECE");
+                            return params;
+                        }
+                    };
+                    queue.add(jsonObjectRequest);
+
+                    break;
             }
-            else if(requestCode == Helper.REQUEST_SPEECH_INPUT){
-                System.out.println(">>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<");
-                System.out.println( data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS));
-                System.out.println(">>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<");
 
-
-
-                String url = "https://jsonplaceholder.typicode.com/todos/1";
-
-                RequestQueue queue = Volley.newRequestQueue(this);
-
-                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                        new Response.Listener<String>() {
-                            public void onResponse(String response) {
-                                System.out.println(response);
-                                mItemReminder.setText("Its set");
-
-                            }
-                        },
-                        new Response.ErrorListener() {
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                System.out.println(error.getMessage());
-                            }
-                        });
-
-                queue.add(stringRequest);
-
-            }
         }
     }
 }
