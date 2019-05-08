@@ -19,11 +19,14 @@ public class Helper {
 
     public static final String EXTRA_TRACK_ITEM = "com.cs646.expirytracker.EXTRA_TRACK_ITEM";
 
-    public static final int REQUEST_SPEECH_INPUT = 5;
+
     public static final int REQUEST_ADD_ITEM = 1;
     public static final int REQUEST_EDIT_ITEM = 2;
     public static final int REQUEST_TAKE_PHOTO = 3;
     public static final int REQUEST_GALLERY_PHOTO = 4;
+    public static final int REQUEST_SPEECH_INPUT_ITEM_NAME = 5;
+    public static final int REQUEST_SPEECH_INPUT_EXPIRY_DATE = 6;
+    public static final int REQUEST_SPEECH_INPUT_REMINDER_DATE = 7;
 
     public static void showMessage(Context context, String message){
         Toast.makeText(context, message,Toast.LENGTH_LONG).show();

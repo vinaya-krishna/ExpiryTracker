@@ -32,7 +32,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
@@ -51,17 +50,13 @@ import com.karumi.dexter.listener.DexterError;
 import com.karumi.dexter.listener.PermissionRequestErrorListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.io.File;
 import java.io.IOException;
-import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -69,22 +64,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
-public class EditItemActivity extends AppCompatActivity {
+public class EditItemActivity extends AppCompatActivity implements View.OnClickListener {
 
     File mPhotoFile;
-    private EditText mItemName;
-    private TextView mItemExpiryDate;
     private FloatingActionButton mAddPhoto;
     private boolean EDIT_MODE = true;
     private FileCompressor mCompressor;
     private ImageView itemImage;
     private Calendar calendar;
-    private TextView mItemReminder;
-    private TextView mVoiceExpityDate;
+
     private NotificationScheduler notificationScheduler;
     DatePickerDialog datePickerDialog;
+
+    private EditText mItemName;
+    private ImageView mItemNameVoice, mItemExpiryDateVoice, mItemReminderVoice, mItemExpiryDateCalendar, mItemReminderCalendar;
+    private TextView mItemExpiryDate,mItemReminder;
 
 
     @Override
@@ -98,12 +93,29 @@ public class EditItemActivity extends AppCompatActivity {
 
         notificationScheduler = new NotificationScheduler(this, ViewItemActivity.class);
 
-        mItemName = findViewById(R.id.edit_item_name);
-        mItemExpiryDate = findViewById(R.id.edit_item_expiry_date);
+
         mAddPhoto = findViewById(R.id.button_add_photo);
         itemImage = findViewById(R.id.edit_item_photo);
+
+        mItemName = findViewById(R.id.edit_item_name);
+        mItemNameVoice = findViewById(R.id.edit_item_name_voice);
+
+        mItemExpiryDate = findViewById(R.id.edit_item_expiry_date);
+        mItemExpiryDateVoice = findViewById(R.id.edit_item_expiry_date_voice);
+        mItemExpiryDateCalendar = findViewById(R.id.edit_item_expiry_date_calendar);
+
+
         mItemReminder = findViewById(R.id.edit_item_reminder);
-        mVoiceExpityDate = findViewById(R.id.edit_date_voice);
+        mItemReminderVoice = findViewById(R.id.edit_item_reminder_voice);
+        mItemReminderCalendar = findViewById(R.id.edit_item_reminder_calendar);
+
+        mAddPhoto.setOnClickListener(this);
+        mItemNameVoice.setOnClickListener(this);
+        mItemExpiryDateVoice.setOnClickListener(this);
+        mItemExpiryDateCalendar.setOnClickListener(this);
+        mItemReminderVoice.setOnClickListener(this);
+        mItemReminderCalendar.setOnClickListener(this);
+
 
         Intent intent = getIntent();
         final TrackItem trackItem = intent.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
@@ -118,80 +130,71 @@ public class EditItemActivity extends AppCompatActivity {
             collapsingToolbarLayout.setTitle("Add Item");
             EDIT_MODE = false;
         }
-
-
-        mAddPhoto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                selectImage();
-            }
-        });
-
-        mItemExpiryDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calendar = Calendar.getInstance();
-                final int day = calendar.get(Calendar.DAY_OF_MONTH);
-                final int month = calendar.get(Calendar.MONTH);
-                final int year = calendar.get(Calendar.YEAR);
-
-                datePickerDialog = new DatePickerDialog(EditItemActivity.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int mYear, int mMonth, int mDay) {
-                        calendar.set(mYear, mMonth, mDay);
-                        mItemExpiryDate.setText(Helper.getStringFromDate(calendar.getTime()));
-                    }
-
-                }, year,month,day);
-
-                datePickerDialog.show();
-            }
-        });
-
-        mItemReminder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                calendar = Calendar.getInstance();
-                final int day = calendar.get(Calendar.DAY_OF_MONTH);
-                final int month = calendar.get(Calendar.MONTH);
-                final int year = calendar.get(Calendar.YEAR);
-
-                datePickerDialog = new DatePickerDialog(EditItemActivity.this, new DatePickerDialog.OnDateSetListener() {
-                    @Override
-                    public void onDateSet(DatePicker view, int mYear, int mMonth, int mDay) {
-                        calendar.set(mYear, mMonth, mDay);
-                        mItemReminder.setText(Helper.getStringFromDate(calendar.getTime()));
-                    }
-
-                }, year,month,day);
-
-                datePickerDialog.show();
-            }
-        });
-
-        mVoiceExpityDate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                promptSpeechInput();
-            }
-        });
-
-
-
-
     }
+
+
+    @Override
+    public void onClick(View v) {
+        System.out.println("Here");
+        switch (v.getId()){
+            case R.id.edit_item_name_voice:
+                promptSpeechInput("Tell me item name",Helper.REQUEST_SPEECH_INPUT_ITEM_NAME);
+                break;
+            case R.id.edit_item_expiry_date_voice:
+                promptSpeechInput("Tell me Expiry date",Helper.REQUEST_SPEECH_INPUT_EXPIRY_DATE);
+                break;
+            case R.id.edit_item_expiry_date_calendar:
+                setDateFromCalendar(mItemExpiryDate);
+
+                break;
+            case R.id.edit_item_reminder_voice:
+                promptSpeechInput("Tell me Reminder date",Helper.REQUEST_SPEECH_INPUT_REMINDER_DATE);
+                break;
+            case R.id.edit_item_reminder_calendar:
+                setDateFromCalendar(mItemReminder);
+
+                break;
+            case R.id.button_add_photo:
+                selectImage();
+
+                break;
+
+        }
+    }
+
+
+
+    private void setDateFromCalendar(final TextView textView){
+        calendar = Calendar.getInstance();
+        final int day = calendar.get(Calendar.DAY_OF_MONTH);
+        final int month = calendar.get(Calendar.MONTH);
+        final int year = calendar.get(Calendar.YEAR);
+
+        datePickerDialog = new DatePickerDialog(EditItemActivity.this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int mYear, int mMonth, int mDay) {
+                calendar.set(mYear, mMonth, mDay);
+                textView.setText(Helper.getStringFromDate(calendar.getTime()));
+            }
+
+        }, year,month,day);
+
+        datePickerDialog.show();
+    }
+
 
     /**
      * Showing google speech input dialog
      * */
-    private void promptSpeechInput() {
+    private void promptSpeechInput(String title, int request_code) {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
-        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Say something \\n Eg: Tomorrow / Day after tomorrow / 21st May / Next month 22nd");
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, title);
+        //\n Eg: Tomorrow / Day after tomorrow / 21st May / Next month 22nd
         try {
-            startActivityForResult(intent, Helper.REQUEST_SPEECH_INPUT);
+            startActivityForResult(intent, request_code);
         } catch (ActivityNotFoundException a) {
            Helper.showMessage(this,"Sorry! Your device doesn't support speech input");
         }
@@ -202,7 +205,7 @@ public class EditItemActivity extends AppCompatActivity {
         String itemExpiryDate = mItemExpiryDate.getText().toString().trim();
         String itemReminderDate = mItemReminder.getText().toString().trim();
 
-        if(itemName.isEmpty() || itemExpiryDate.isEmpty() || itemReminderDate.isEmpty()){
+        if(itemName.isEmpty() || itemExpiryDate.isEmpty() || itemReminderDate.isEmpty() || mPhotoFile == null){
             Helper.showMessage(this, "Please Enter All details");
             return;
         }
@@ -219,7 +222,6 @@ public class EditItemActivity extends AppCompatActivity {
         else{
 
             //schedule notification
-
 
             updatedTrackItem = new TrackItem(itemName, new Date(),
                                             Helper.getDateFromString(itemExpiryDate),
@@ -444,79 +446,109 @@ public class EditItemActivity extends AppCompatActivity {
 
                     break;
 
-                case Helper.REQUEST_SPEECH_INPUT:
+                case Helper.REQUEST_SPEECH_INPUT_ITEM_NAME:
+                    ArrayList<String> result_name = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    try{
+                        mItemName.setText(result_name.get(0));
+                    }catch (Exception e){
+                        Helper.showMessage(this, e.getMessage());
+                    }
 
-                    ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    break;
 
-                    String query = result.get(0);
-                    query = query.replaceAll("\\s", "%20");
+                case Helper.REQUEST_SPEECH_INPUT_EXPIRY_DATE:
+                    ArrayList<String> result_exp_dates = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    try{
 
-                    String url = "https://api.wit.ai/message?v=20190508&q=" + query;
-                    RequestQueue queue = Volley.newRequestQueue(this);
+                        getDateFromSpeech(mItemExpiryDate, result_exp_dates.get(0));
+                    }catch (Exception e){
+                        Helper.showMessage(this, e.getMessage());
+                    }
 
-                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
-                            new Response.Listener<JSONObject>() {
-                                @Override
-                                public void onResponse(JSONObject response) {
-                                    try {
+                    break;
 
-                                        JSONObject valuesObj = response.getJSONObject("entities").
-                                                getJSONArray("datetime").
-                                                getJSONObject(0).getJSONArray("values")
-                                                .getJSONObject(0);
+                case Helper.REQUEST_SPEECH_INPUT_REMINDER_DATE:
+                    ArrayList<String> result_rem_dates = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    try{
 
-                                        if (valuesObj.getString("type").equals("value")) {
-                                            String value = valuesObj.getString("value");
-
-                                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                                            try {
-                                                Date date = dateFormat.parse(value);
-                                                mItemExpiryDate.setText(Helper.getStringFromDate(date));
-
-
-                                            } catch (ParseException e) {
-                                                Helper.showMessage(EditItemActivity.this, e.getMessage());
-                                            }
-
-
-                                        } else if (valuesObj.getString("type").equals("interval")) {
-                                            String value = valuesObj.getJSONObject("from").getString("value");
-
-
-                                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                                            try {
-
-                                                Date date = dateFormat.parse(value);
-                                                mItemExpiryDate.setText(Helper.getStringFromDate(date));
-
-                                            } catch (ParseException e) {
-                                                Helper.showMessage(EditItemActivity.this, e.getMessage());
-                                            }
-
-                                        }
-
-                                    } catch (JSONException e) {
-                                        Helper.showMessage(EditItemActivity.this, "Not Recognised");
-                                    }
-                                }
-                            }, new Response.ErrorListener() {
-                        @Override
-                        public void onErrorResponse(VolleyError error) {
-                            Helper.showMessage(EditItemActivity.this, error.getMessage());
-                        }
-                    }) {
-                        @Override
-                        public Map<String, String> getHeaders() throws AuthFailureError {
-                            Map<String, String> params = new HashMap<>();
-                            params.put("Authorization", "Bearer GHT67LFYOCSXTP6A4Q6REO5X4QACJECE");
-                            return params;
-                        }
-                    };
-                    queue.add(jsonObjectRequest);
+                        getDateFromSpeech(mItemReminder, result_rem_dates.get(0));
+                    }catch (Exception e){
+                        Helper.showMessage(this, e.getMessage());
+                    }
 
                     break;
             }
 
         }
     }
+
+
+    private void getDateFromSpeech(final TextView textView, String speechString){
+
+        speechString = speechString.replaceAll("\\s", "%20");
+
+        String url = "https://api.wit.ai/message?v=20190508&q=" + speechString;
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+
+                            JSONObject valuesObj = response.getJSONObject("entities").
+                                    getJSONArray("datetime").
+                                    getJSONObject(0).getJSONArray("values")
+                                    .getJSONObject(0);
+
+                            if (valuesObj.getString("type").equals("value")) {
+                                String value = valuesObj.getString("value");
+
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                                try {
+                                    Date date = dateFormat.parse(value);
+                                    textView.setText(Helper.getStringFromDate(date));
+
+
+                                } catch (ParseException e) {
+                                    Helper.showMessage(EditItemActivity.this, e.getMessage());
+                                }
+
+
+                            } else if (valuesObj.getString("type").equals("interval")) {
+                                String value = valuesObj.getJSONObject("from").getString("value");
+
+
+                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                                try {
+
+                                    Date date = dateFormat.parse(value);
+                                    textView.setText(Helper.getStringFromDate(date));
+
+                                } catch (ParseException e) {
+                                    Helper.showMessage(EditItemActivity.this, e.getMessage());
+                                }
+
+                            }
+
+                        } catch (JSONException e) {
+                            Helper.showMessage(EditItemActivity.this, "Not Recognised");
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Helper.showMessage(EditItemActivity.this, error.getMessage());
+            }
+        }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("Authorization", "Bearer GHT67LFYOCSXTP6A4Q6REO5X4QACJECE");
+                return params;
+            }
+        };
+        queue.add(jsonObjectRequest);
+    }
+
 }
