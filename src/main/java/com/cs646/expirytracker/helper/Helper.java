@@ -8,6 +8,7 @@ import com.cs646.expirytracker.R;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -44,6 +45,11 @@ public class Helper {
     }
 
     public static String getStringFromDate(Date date){
+//        Calendar cal = Calendar.getInstance();
+//        cal.setTime(date);
+//        cal.set(Calendar.HOUR_OF_DAY,9);
+//        date = cal.getTime();
+
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
         return dateFormat.format(date);
     }
@@ -66,17 +72,20 @@ public class Helper {
 
 
 
-
-    //Todo Speech input
     //Todo Update view in list view circular thing and date style
 
     //Todo different colors for the theme
     //Todo icon for app
     //Todo icon Inside tool bar
 
-    //Todo Edit Screen 1. Name, 2. Expiry date, 3. Set Notification days(1 day before, 2 day before ect)
+    //todo show expired today, expires tomorrow, expires on Date
+    //todo notification , show proper date
+    //todo if possible implemt settings always notification comes at 9am
 
-
+    //todo
+    //correction in view page
+    //view -> edit section
+    // reminder date fill
 
     //todo using calender you can add substract date https://stackoverflow.com/questions/5894726/how-do-i-do-calendar-arithmetic-with-java-util-date
 
