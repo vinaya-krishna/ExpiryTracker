@@ -27,16 +27,27 @@ public class TrackItem implements Parcelable {
 
     private Date dateExpiry;
 
+    private Date dateReminder;
+
     private int itemCount;
 
     private String itemImagePath;
 
-    public TrackItem(String name, Date dateCreation, Date dateExpiry, int itemCount, String itemImagePath) {
+    public TrackItem(String name, Date dateCreation, Date dateExpiry, Date dateReminder, int itemCount, String itemImagePath) {
         this.name = name;
         this.dateCreation = dateCreation;
         this.dateExpiry = dateExpiry;
+        this.dateReminder = dateReminder;
         this.itemCount = itemCount;
         this.itemImagePath = itemImagePath;
+    }
+
+    public Date getDateReminder() {
+        return dateReminder;
+    }
+
+    public void setDateReminder(Date dateReminder) {
+        this.dateReminder = dateReminder;
     }
 
     public String getItemImagePath() {
@@ -54,6 +65,7 @@ public class TrackItem implements Parcelable {
         itemCount = in.readInt();
         dateCreation = new Date(in.readLong());
         dateExpiry = new Date(in.readLong());
+        dateReminder = new Date(in.readLong());
         itemImagePath = in.readString();
     }
 
@@ -121,6 +133,7 @@ public class TrackItem implements Parcelable {
         dest.writeInt(itemCount);
         dest.writeLong(dateCreation.getTime());
         dest.writeLong(dateExpiry.getTime());
+        dest.writeLong(dateReminder.getTime());
         dest.writeString(itemImagePath);
     }
 }

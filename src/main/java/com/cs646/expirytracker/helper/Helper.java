@@ -19,6 +19,7 @@ public class Helper {
 
     public static final String EXTRA_TRACK_ITEM = "com.cs646.expirytracker.EXTRA_TRACK_ITEM";
 
+    public static final int REQUEST_SPEECH_INPUT = 5;
     public static final int REQUEST_ADD_ITEM = 1;
     public static final int REQUEST_EDIT_ITEM = 2;
     public static final int REQUEST_TAKE_PHOTO = 3;
@@ -55,7 +56,13 @@ public class Helper {
     }
 
 
-    //Todo add remainder : update view , database, set notification
+
+
+
+
+
+
+
 
     //Todo Speech input
     //Todo Update view in list view circular thing and date style
@@ -66,10 +73,7 @@ public class Helper {
 
     //Todo Edit Screen 1. Name, 2. Expiry date, 3. Set Notification days(1 day before, 2 day before ect)
 
-    //scheduleBroadCaster : Date, TrackItem Object
-    //need to save alarm manager object? No
-    //make the request code to id of the object, so later you can get it
-    //Cancel BroadCaster : my be save the alarmmanagr object in the database : Not required
+
 
     //todo using calender you can add substract date https://stackoverflow.com/questions/5894726/how-do-i-do-calendar-arithmetic-with-java-util-date
 

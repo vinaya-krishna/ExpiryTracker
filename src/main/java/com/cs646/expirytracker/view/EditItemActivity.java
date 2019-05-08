@@ -8,6 +8,7 @@ import androidx.core.content.FileProvider;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
+import android.speech.RecognizerIntent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +26,12 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.cs646.expirytracker.BuildConfig;
@@ -31,13 +39,13 @@ import com.cs646.expirytracker.R;
 import com.cs646.expirytracker.database.TrackItem;
 import com.cs646.expirytracker.helper.FileCompressor;
 import com.cs646.expirytracker.helper.Helper;
+import com.cs646.expirytracker.helper.NotificationScheduler;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.MultiplePermissionsReport;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.DexterError;
-import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.PermissionRequestErrorListener;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 
@@ -47,6 +55,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class EditItemActivity extends AppCompatActivity {
 
@@ -59,7 +68,11 @@ public class EditItemActivity extends AppCompatActivity {
     private FileCompressor mCompressor;
     private ImageView itemImage;
     private Calendar calendar;
+    private TextView mItemReminder;
+    private TextView mVoiceExpityDate;
+    private NotificationScheduler notificationScheduler;
     DatePickerDialog datePickerDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,11 +83,15 @@ public class EditItemActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.edit_collapsing_toolbar);
 
+        notificationScheduler = new NotificationScheduler(this, ViewItemActivity.class);
+
         mItemName = findViewById(R.id.edit_item_name);
         mItemCount = findViewById(R.id.edit_item_count);
         mItemExpiryDate = findViewById(R.id.edit_item_expiry_date);
         mAddPhoto = findViewById(R.id.button_add_photo);
         itemImage = findViewById(R.id.edit_item_photo);
+        mItemReminder = findViewById(R.id.edit_item_reminder);
+        mVoiceExpityDate = findViewById(R.id.edit_date_voice);
 
         Intent intent = getIntent();
         final TrackItem trackItem = intent.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
@@ -120,8 +137,53 @@ public class EditItemActivity extends AppCompatActivity {
             }
         });
 
+        mItemReminder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calendar = Calendar.getInstance();
+                final int day = calendar.get(Calendar.DAY_OF_MONTH);
+                final int month = calendar.get(Calendar.MONTH);
+                final int year = calendar.get(Calendar.YEAR);
+
+                datePickerDialog = new DatePickerDialog(EditItemActivity.this, new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int mYear, int mMonth, int mDay) {
+                        calendar.set(mYear, mMonth, mDay);
+                        mItemReminder.setText(Helper.getStringFromDate(calendar.getTime()));
+                    }
+
+                }, year,month,day);
+
+                datePickerDialog.show();
+            }
+        });
+
+        mVoiceExpityDate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                promptSpeechInput();
+            }
+        });
 
 
+
+
+    }
+
+    /**
+     * Showing google speech input dialog
+     * */
+    private void promptSpeechInput() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault());
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Say something");
+        try {
+            startActivityForResult(intent, Helper.REQUEST_SPEECH_INPUT);
+        } catch (ActivityNotFoundException a) {
+           Helper.showMessage(this,"Sorry! Your device doesn't support speech input");
+        }
     }
 
 
@@ -129,8 +191,9 @@ public class EditItemActivity extends AppCompatActivity {
         String itemName = mItemName.getText().toString().trim();
         String itemCount = mItemCount.getText().toString().trim();
         String itemExpiryDate = mItemExpiryDate.getText().toString().trim();
+        String itemReminderDate = mItemReminder.getText().toString().trim();
 
-        if(itemName.isEmpty() || itemCount.isEmpty() || itemExpiryDate.isEmpty()){
+        if(itemName.isEmpty() || itemCount.isEmpty() || itemExpiryDate.isEmpty() || itemReminderDate.isEmpty()){
             Helper.showMessage(this, "Please Enter All details");
             return;
         }
@@ -138,6 +201,7 @@ public class EditItemActivity extends AppCompatActivity {
         Intent data = new Intent();
         TrackItem updatedTrackItem;
         if(EDIT_MODE){
+
             updatedTrackItem = getIntent().getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
             updatedTrackItem.setName(itemName);
             updatedTrackItem.setDateExpiry(Helper.getDateFromString(itemExpiryDate));
@@ -145,12 +209,21 @@ public class EditItemActivity extends AppCompatActivity {
             updatedTrackItem.setItemImagePath(mPhotoFile.toString());
         }
         else{
+
+            //schedule notification
+
+
             updatedTrackItem = new TrackItem(itemName, new Date(),
                                             Helper.getDateFromString(itemExpiryDate),
+                                            Helper.getDateFromString(itemReminderDate),
                                             Integer.parseInt(itemCount),
                                             mPhotoFile.toString());
 
+
+
         }
+
+        notificationScheduler.scheduleNotification(updatedTrackItem);
 
         data.putExtra(Helper.EXTRA_TRACK_ITEM,updatedTrackItem);
         setResult(RESULT_OK, data);
@@ -316,6 +389,27 @@ public class EditItemActivity extends AppCompatActivity {
         startActivityForResult(pickPhoto, Helper.REQUEST_GALLERY_PHOTO);
     }
 
+
+    /**
+     * Get real file path from URI
+     */
+    public String getRealPathFromUri(Uri contentUri) {
+        Cursor cursor = null;
+        try {
+            String[] proj = {MediaStore.Images.Media.DATA};
+            cursor = getContentResolver().query(contentUri, proj, null, null, null);
+            assert cursor != null;
+            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+            cursor.moveToFirst();
+            return cursor.getString(column_index);
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+    }
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (resultCode == RESULT_OK) {
@@ -334,26 +428,35 @@ public class EditItemActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 Glide.with(EditItemActivity.this).load(mPhotoFile).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(itemImage);
-
             }
-        }
-    }
+            else if(requestCode == Helper.REQUEST_SPEECH_INPUT){
+                System.out.println(">>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<");
+                System.out.println( data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS));
+                System.out.println(">>>>>>>>>>>>>>>>>>>>><<<<<<<<<<<<<<<<<<");
 
-    /**
-     * Get real file path from URI
-     */
-    public String getRealPathFromUri(Uri contentUri) {
-        Cursor cursor = null;
-        try {
-            String[] proj = {MediaStore.Images.Media.DATA};
-            cursor = getContentResolver().query(contentUri, proj, null, null, null);
-            assert cursor != null;
-            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-            cursor.moveToFirst();
-            return cursor.getString(column_index);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
+
+
+                String url = "https://jsonplaceholder.typicode.com/todos/1";
+
+                RequestQueue queue = Volley.newRequestQueue(this);
+
+                StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                        new Response.Listener<String>() {
+                            public void onResponse(String response) {
+                                System.out.println(response);
+                                mItemReminder.setText("Its set");
+
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                System.out.println(error.getMessage());
+                            }
+                        });
+
+                queue.add(stringRequest);
+
             }
         }
     }

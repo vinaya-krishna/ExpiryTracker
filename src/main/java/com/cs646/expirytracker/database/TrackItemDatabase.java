@@ -14,7 +14,7 @@ import com.cs646.expirytracker.helper.Helper;
 
 import java.util.Date;
 
-@Database(entities = {TrackItem.class}, version = 2)
+@Database(entities = {TrackItem.class}, version = 3)
 public abstract class TrackItemDatabase extends RoomDatabase {
 
     private static TrackItemDatabase instance;
@@ -61,9 +61,9 @@ public abstract class TrackItemDatabase extends RoomDatabase {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            this.trackItemDao.insert( new TrackItem("Bread",new Date(), new Date(), 10, Helper.getURLForResource(R.drawable.firework)));
-            this.trackItemDao.insert( new TrackItem("Apple",new Date(), new Date(), 14, Helper.getURLForResource(R.drawable.firework)));
-            this.trackItemDao.insert( new TrackItem("Banana",new Date(), new Date(), 11, Helper.getURLForResource(R.drawable.firework)));
+//            this.trackItemDao.insert( new TrackItem("Bread",new Date(), new Date(), 10, Helper.getURLForResource(R.drawable.firework)));
+//            this.trackItemDao.insert( new TrackItem("Apple",new Date(), new Date(), 14, Helper.getURLForResource(R.drawable.firework)));
+//            this.trackItemDao.insert( new TrackItem("Banana",new Date(), new Date(), 11, Helper.getURLForResource(R.drawable.firework)));
             return null;
         }
     }
