@@ -14,6 +14,7 @@ import com.cs646.expirytracker.R;
 import com.cs646.expirytracker.broadcast.AlarmReceiver;
 import com.cs646.expirytracker.database.TrackItem;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class NotificationScheduler {
@@ -55,9 +56,15 @@ public class NotificationScheduler {
         return contentIntent;
     }
 
-    private int getTimeToNotify(Date expiryDate){
+    private long getTimeToNotify(Date reminderDate){
         //todo implement getTimeToNotify and  date convertion
-        return 10000;
+
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(reminderDate);
+        cal.set(Calendar.HOUR_OF_DAY,9);
+        reminderDate = cal.getTime();
+
+        return reminderDate.getTime();
 
     }
 
@@ -71,17 +78,15 @@ public class NotificationScheduler {
         String title = trackItem.getName();
         String text = trackItem.getName() + " expiring on " + trackItem.getDateExpiry();
 
-        int timeForNotify = getTimeToNotify(trackItem.getDateReminder());
+        long futureInMillis = getTimeToNotify(trackItem.getDateReminder());
 
         Intent broadCastIntent = new Intent(context, AlarmReceiver.class);
         broadCastIntent.putExtra(AlarmReceiver.NOTIFICATION_ID, trackItem.getId());
         broadCastIntent.putExtra(AlarmReceiver.NOTIFICATION,getNotification(trackItem, title, text));
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, trackItem.getId(), broadCastIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-
-
         //action on time
-        long futureInMillis = SystemClock.elapsedRealtime() + timeForNotify;
+//        long futureInMillis = SystemClock.elapsedRealtime() + timeForNotify;
         AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, futureInMillis, pendingIntent);
 

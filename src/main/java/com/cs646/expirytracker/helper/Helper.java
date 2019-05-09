@@ -55,8 +55,14 @@ public class Helper {
     }
 
     public static int getNumberofDays(Date date_start, Date date_end){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date_start);
+        cal.set(Calendar.HOUR_OF_DAY,0);
+        cal.set(Calendar.MINUTE,0);
+        cal.set(Calendar.SECOND,0);
+        date_start = cal.getTime();
         long diff = date_end.getTime() - date_start.getTime();
-        float days = (diff / (1000*60*60*24));
+        double days = (diff / (1000*60*60*23.9));
         return (int)(days);
     }
 
@@ -72,20 +78,14 @@ public class Helper {
 
 
 
-    //Todo Update view in list view circular thing and date style
 
-    //Todo different colors for the theme
-    //Todo icon for app
+
     //Todo icon Inside tool bar
 
     //todo show expired today, expires tomorrow, expires on Date
     //todo notification , show proper date
     //todo if possible implemt settings always notification comes at 9am
 
-    //todo
-    //correction in view page
-    //view -> edit section
-    // reminder date fill
 
     //todo using calender you can add substract date https://stackoverflow.com/questions/5894726/how-do-i-do-calendar-arithmetic-with-java-util-date
 

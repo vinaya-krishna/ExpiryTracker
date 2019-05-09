@@ -64,119 +64,109 @@
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="12dp"
-                        android:textSize="20sp"
-                        android:layout_weight="1"
-                        android:layout_marginTop="12dp"
-                        android:text="Days Left : " />
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:text="Days Left " />
                     <TextView
                         android:id="@+id/view_days_left"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="12dp"
+                        android:layout_marginBottom="8dp"
                         android:textSize="20sp"
-                        android:layout_weight="0.75"
-                        android:layout_marginTop="12dp"
+                        android:paddingLeft="12dp"
 
                         />
                 </LinearLayout>
                 <View
                     android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:background="#c0c0c0"/>
+                    android:layout_height="1dp"
+                    android:background="@color/lightGray"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                    android:padding="8dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="12dp"
-                        android:textSize="20sp"
-                        android:layout_weight="1"
-                        android:layout_marginTop="12dp"
-                        android:text="Count : " />
-                    <TextView
-                        android:id="@+id/view_item_count"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="12dp"
-                        android:textSize="20sp"
-                        android:layout_weight="0.75"
-                        android:layout_marginTop="12dp"
-
-                        />
-                </LinearLayout>
-                <View
-                    android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:background="#c0c0c0"/>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="12dp"
-                        android:textSize="20sp"
-                        android:layout_weight="1"
-                        android:layout_marginTop="12dp"
-                        android:text="Added on : " />
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:text="Added on" />
                     <TextView
                         android:id="@+id/view_add_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="12dp"
                         android:textSize="20sp"
-                        android:layout_weight="0.75"
-                        android:layout_marginTop="12dp"
-
-                        />
+                        android:paddingLeft="12dp"
+                        android:layout_marginBottom="8dp"/>
                 </LinearLayout>
                 <View
                     android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:background="#c0c0c0"/>
+                    android:layout_height="1dp"
+                    android:background="@color/lightGray"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:orientation="horizontal">
+                    android:padding="8dp"
+                    android:orientation="vertical">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="12dp"
-                        android:textSize="20sp"
-                        android:layout_weight="1"
-                        android:layout_marginTop="12dp"
-                        android:text="Expires on : " />
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:text="Expires on" />
                     <TextView
                         android:id="@+id/view_expiry_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="12dp"
+                        android:layout_marginBottom="8dp"
                         android:textSize="20sp"
-                        android:layout_weight="0.75"
-                        android:layout_marginTop="12dp"
+                        android:paddingLeft="12dp"
 
                         />
                 </LinearLayout>
                 <View
                     android:layout_width="fill_parent"
-                    android:layout_height="2dp"
-                    android:background="#c0c0c0"/>
+                    android:layout_height="1dp"
+                    android:background="@color/lightGray"/>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="8dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="12dp"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+                        android:text="Reminder Date" />
+                    <TextView
+                        android:id="@+id/view_item_reminder_date"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:textSize="20sp"
+                        android:paddingLeft="12dp"
+
+                        />
+                </LinearLayout>
+                <View
+                    android:layout_width="fill_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/lightGray"/>
 
 
             </LinearLayout>

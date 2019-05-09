@@ -1,8 +1,10 @@
 package com.cs646.expirytracker.view;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,7 +22,11 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
 
     private List<TrackItem> items = new ArrayList<>();
     private OnItemListener mOnItemListener;
+    private Context context;
 
+    public ItemAdapter(Context context){
+        this.context = context;
+    }
 
     @NonNull
     @Override
@@ -37,12 +43,24 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
         holder.textViewName.setText(trackItem.getName());
         String date_n = Helper.getStringFromDate(trackItem.getDateExpiry());
 
-
         int num_of_days = Helper.getNumberofDays(new Date(), trackItem.getDateExpiry());
-
         holder.textViewDate.setText(date_n);
-
         holder.textViewReaminingDays.setText((num_of_days + " days remaining"));
+
+
+        if(num_of_days > 7){
+            holder.trackItemLogo.setColorFilter(context.getResources().getColor(R.color.green));
+            holder.textViewDate.setBackgroundColor(context.getResources().getColor(R.color.green));
+        }
+        else if(num_of_days > 2){
+            holder.trackItemLogo.setColorFilter(context.getResources().getColor(R.color.yellow));
+            holder.textViewDate.setBackgroundColor(context.getResources().getColor(R.color.yellow));
+        }
+        else if (num_of_days <= 2){
+            holder.trackItemLogo.setColorFilter(context.getResources().getColor(R.color.red));
+            holder.textViewDate.setBackgroundColor(context.getResources().getColor(R.color.red));
+        }
+
 
     }
 
@@ -69,6 +87,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
 
 
     class ItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private ImageView trackItemLogo;
         private TextView textViewName;
         private TextView textViewDate;
         private TextView textViewReaminingDays;
@@ -80,6 +99,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
             textViewName = itemView.findViewById(R.id.item_name);
             textViewDate = itemView.findViewById(R.id.item_expiry_date);
             textViewReaminingDays = itemView.findViewById(R.id.item_days_remain);
+            trackItemLogo = itemView.findViewById(R.id.item_track);
             itemView.setOnClickListener(this);
         }
 

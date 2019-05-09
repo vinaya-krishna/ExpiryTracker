@@ -163,6 +163,7 @@
     <orderEntry type="library" name="Gradle: androidx.loader:loader:1.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.room:room-runtime:2.1.0-alpha07@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.room:room-common:2.1.0-alpha07@jar" level="project" />
+    <orderEntry type="library" name="Gradle: gr.pantrif:easy-android-splash-screen:0.0.1@aar" level="project" />
     <orderEntry type="library" scope="TEST" name="Gradle: androidx.test.espresso:espresso-idling-resource:3.1.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-livedata:2.0.0@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.github.bumptech.glide:gifdecoder:4.7.1@aar" level="project" />

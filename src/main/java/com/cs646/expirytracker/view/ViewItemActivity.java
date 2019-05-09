@@ -25,7 +25,7 @@ import java.util.Date;
 
 public class ViewItemActivity extends AppCompatActivity {
 
-    TextView itemCount, itemAddedOn, itemExpiryOn, itemDaysLeft;
+    TextView itemAddedOn, itemExpiryOn, itemDaysLeft, itemReminderDate;
     Toolbar toolbar;
     TrackItem trackItem;
     ImageView viewItemPhoto;
@@ -42,11 +42,11 @@ public class ViewItemActivity extends AppCompatActivity {
 
         trackItemViewModel = ViewModelProviders.of(this).get(TrackItemViewModel.class);
 
-        itemCount = findViewById(R.id.view_item_count);
         itemAddedOn = findViewById(R.id.view_add_date);
         itemExpiryOn = findViewById(R.id.view_expiry_date);
         itemDaysLeft = findViewById(R.id.view_days_left);
         viewItemPhoto = findViewById(R.id.view_item_photo);
+        itemReminderDate = findViewById(R.id.view_item_reminder_date);
 
         updateView(trackItem);
 
@@ -64,7 +64,7 @@ public class ViewItemActivity extends AppCompatActivity {
 
     private void updateView(TrackItem trackItem){
         Glide.with(this).load(new File(trackItem.getItemImagePath())).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(viewItemPhoto);
-        itemCount.setText(""+trackItem.getItemCount());
+        itemReminderDate.setText(Helper.getStringFromDate(trackItem.getDateReminder()));
         CollapsingToolbarLayout toolbar = findViewById(R.id.view_collapsing_toolbar);
         toolbar.setTitle(trackItem.getName());
 

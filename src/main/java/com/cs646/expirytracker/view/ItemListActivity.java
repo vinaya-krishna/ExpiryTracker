@@ -45,7 +45,8 @@ public class ItemListActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
 
-        final ItemAdapter itemAdapter = new ItemAdapter();
+
+        final ItemAdapter itemAdapter = new ItemAdapter(this);
         recyclerView.setAdapter(itemAdapter);
 
         trackItemViewModel = ViewModelProviders.of(this).get(TrackItemViewModel.class);

@@ -68,6 +68,7 @@ import java.util.Map;
 public class EditItemActivity extends AppCompatActivity implements View.OnClickListener {
 
     File mPhotoFile;
+    String photoFilePath;
     private FloatingActionButton mAddPhoto;
     private boolean EDIT_MODE = true;
     private FileCompressor mCompressor;
@@ -125,6 +126,8 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
             EDIT_MODE = true;
             mItemName.setText(trackItem.getName());
             mItemExpiryDate.setText(Helper.getStringFromDate(trackItem.getDateExpiry()));
+            mItemReminder.setText(Helper.getStringFromDate(trackItem.getDateReminder()));
+            photoFilePath = trackItem.getItemImagePath();
             Glide.with(this).load(new File(trackItem.getItemImagePath())).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(itemImage);
         }else{
             collapsingToolbarLayout.setTitle("Add Item");
@@ -205,10 +208,12 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
         String itemExpiryDate = mItemExpiryDate.getText().toString().trim();
         String itemReminderDate = mItemReminder.getText().toString().trim();
 
-        if(itemName.isEmpty() || itemExpiryDate.isEmpty() || itemReminderDate.isEmpty() || mPhotoFile == null){
+        if(itemName.isEmpty() || itemExpiryDate.isEmpty() || itemReminderDate.isEmpty()){
             Helper.showMessage(this, "Please Enter All details");
             return;
         }
+
+
 
         Intent data = new Intent();
         TrackItem updatedTrackItem;
@@ -217,17 +222,25 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
             updatedTrackItem = getIntent().getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
             updatedTrackItem.setName(itemName);
             updatedTrackItem.setDateExpiry(Helper.getDateFromString(itemExpiryDate));
-            updatedTrackItem.setItemImagePath(mPhotoFile.toString());
+            if(mPhotoFile == null)
+                updatedTrackItem.setItemImagePath(photoFilePath);
+            else
+                updatedTrackItem.setItemImagePath(mPhotoFile.toString());
         }
         else{
 
             //schedule notification
 
+            if(mPhotoFile == null){
+                Helper.showMessage(this, "Please add a photo");
+                return;
+            }
+
             updatedTrackItem = new TrackItem(itemName, new Date(),
                                             Helper.getDateFromString(itemExpiryDate),
                                             Helper.getDateFromString(itemReminderDate),
                                             Integer.parseInt("1"),
-                                            mPhotoFile.toString());
+                    mPhotoFile.toString());
 
 
 
@@ -449,7 +462,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
                 case Helper.REQUEST_SPEECH_INPUT_ITEM_NAME:
                     ArrayList<String> result_name = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     try{
-                        mItemName.setText(result_name.get(0));
+                        mItemName.setText(capitalizeText(result_name.get(0)));
                     }catch (Exception e){
                         Helper.showMessage(this, e.getMessage());
                     }
@@ -482,6 +495,10 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    public static String capitalizeText(String str)
+    {
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
 
     private void getDateFromSpeech(final TextView textView, String speechString){
 

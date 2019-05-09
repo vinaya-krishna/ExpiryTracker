@@ -93,6 +93,7 @@
                             android:padding="12dp"
                             android:textSize="20sp"
                             android:layout_weight="0.8"
+                            android:maxLines="1"
                             android:hint="Item Name" />
 
                         <ImageView
