@@ -19,14 +19,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.ItemListActivity"></activity>
+        <activity android:name=".view.SettingsActivity"></activity>
+        <activity android:name=".view.ItemListActivity" />
         <activity
             android:name=".view.ViewItemActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".view.EditItemActivity"
-            android:windowSoftInputMode="adjustResize"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name=".SplashActivity"
             android:launchMode="singleTop"

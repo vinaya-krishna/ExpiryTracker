@@ -29,4 +29,7 @@ public interface TrackItemDao {
     @Query("SELECT * FROM  track_item_table ORDER BY dateExpiry ASC")
     LiveData<List<TrackItem>> getAllItems();
 
+    @Query("SELECT * FROM track_item_table WHERE id = :id")
+    TrackItem getItem(String id);
+
 }

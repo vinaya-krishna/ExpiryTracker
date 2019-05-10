@@ -45,20 +45,38 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
 
         int num_of_days = Helper.getNumberofDays(new Date(), trackItem.getDateExpiry());
         holder.textViewDate.setText(date_n);
-        holder.textViewReaminingDays.setText((num_of_days + " days remaining"));
+        String status;
+
+        if(num_of_days == 2){
+            status = "Expiring tomorrow";
+        }
+        else if(num_of_days == 1){
+            status = "Expiring today";
+        }
+        else if(num_of_days <= 0){
+            status = "Expired!";
+        }
+        else{
+            status = num_of_days + " days remaining";
+        }
+
+        holder.textViewReaminingDays.setText(status);
 
 
         if(num_of_days > 7){
             holder.trackItemLogo.setColorFilter(context.getResources().getColor(R.color.green));
             holder.textViewDate.setBackgroundColor(context.getResources().getColor(R.color.green));
+            holder.textViewReaminingDays.setTextColor(context.getResources().getColor(R.color.green));
         }
         else if(num_of_days > 2){
             holder.trackItemLogo.setColorFilter(context.getResources().getColor(R.color.yellow));
             holder.textViewDate.setBackgroundColor(context.getResources().getColor(R.color.yellow));
+            holder.textViewReaminingDays.setTextColor(context.getResources().getColor(R.color.yellow));
         }
         else if (num_of_days <= 2){
             holder.trackItemLogo.setColorFilter(context.getResources().getColor(R.color.red));
             holder.textViewDate.setBackgroundColor(context.getResources().getColor(R.color.red));
+            holder.textViewReaminingDays.setTextColor(context.getResources().getColor(R.color.red));
         }
 
 

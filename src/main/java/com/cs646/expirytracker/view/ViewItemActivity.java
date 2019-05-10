@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -29,7 +30,8 @@ public class ViewItemActivity extends AppCompatActivity {
     Toolbar toolbar;
     TrackItem trackItem;
     ImageView viewItemPhoto;
-    private TrackItemViewModel trackItemViewModel;
+    LinearLayout itemDayLeftLayout, itemExpiredLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,11 +42,11 @@ public class ViewItemActivity extends AppCompatActivity {
         Intent intent = getIntent();
         trackItem = intent.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
 
-        trackItemViewModel = ViewModelProviders.of(this).get(TrackItemViewModel.class);
-
         itemAddedOn = findViewById(R.id.view_add_date);
         itemExpiryOn = findViewById(R.id.view_expiry_date);
         itemDaysLeft = findViewById(R.id.view_days_left);
+        itemDayLeftLayout = findViewById(R.id.layout_daysleft);
+        itemExpiredLayout = findViewById(R.id.layout_expired);
         viewItemPhoto = findViewById(R.id.view_item_photo);
         itemReminderDate = findViewById(R.id.view_item_reminder_date);
 
@@ -56,7 +58,8 @@ public class ViewItemActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent editIntent = new Intent(ViewItemActivity.this, EditItemActivity.class);
                 editIntent.putExtra(Helper.EXTRA_TRACK_ITEM,trackItem);
-                startActivityForResult(editIntent, Helper.REQUEST_EDIT_ITEM);
+//                startActivityForResult(editIntent, Helper.REQUEST_EDIT_ITEM);
+                startActivity(editIntent);
             }
         });
 
@@ -72,18 +75,26 @@ public class ViewItemActivity extends AppCompatActivity {
         itemExpiryOn.setText(Helper.getStringFromDate(trackItem.getDateExpiry()));
         int num_of_days = Helper.getNumberofDays(new Date(), trackItem.getDateExpiry());
         itemDaysLeft.setText(""+num_of_days);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if(requestCode == Helper.REQUEST_EDIT_ITEM && resultCode == RESULT_OK){
-            trackItem = data.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
-            //Update the view
-            trackItemViewModel.updateItem(trackItem);
-            //Update in the ViewModel
-            updateView(trackItem);
+        if(num_of_days <= 0){
+            itemDayLeftLayout.setVisibility(View.GONE);
+            itemExpiredLayout.setVisibility(View.VISIBLE);
+        }
+        else {
+            itemDayLeftLayout.setVisibility(View.VISIBLE);
+            itemExpiredLayout.setVisibility(View.GONE);
         }
     }
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//
+//        if(requestCode == Helper.REQUEST_EDIT_ITEM && resultCode == RESULT_OK){
+//            trackItem = data.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
+//            //Update the view
+//            trackItemViewModel.updateItem(trackItem);
+//            //Update in the ViewModel
+//            updateView(trackItem);
+//        }
+//    }
 }

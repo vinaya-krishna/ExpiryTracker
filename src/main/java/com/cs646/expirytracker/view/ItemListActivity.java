@@ -11,11 +11,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.cs646.expirytracker.R;
 import com.cs646.expirytracker.database.TrackItem;
 import com.cs646.expirytracker.helper.Helper;
+import com.cs646.expirytracker.helper.NotificationScheduler;
 import com.cs646.expirytracker.viewmodel.TrackItemViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -36,7 +39,8 @@ public class ItemListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ItemListActivity.this, EditItemActivity.class);
-                startActivityForResult(intent, Helper.REQUEST_ADD_ITEM);
+//                startActivityForResult(intent, Helper.REQUEST_ADD_ITEM);
+                startActivity(intent);
             }
         });
 
@@ -71,8 +75,12 @@ public class ItemListActivity extends AppCompatActivity {
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                    trackItemViewModel.deleteItem(itemAdapter.getTrackItemAt(viewHolder.getAdapterPosition()));
+                    TrackItem trackItemDelete = itemAdapter.getTrackItemAt(viewHolder.getAdapterPosition());
+                    trackItemViewModel.deleteItem(trackItemDelete);
                     Helper.showMessage(getBaseContext(), "Item Deleted");
+                    NotificationScheduler notificationScheduler = NotificationScheduler.getInstance();
+                    notificationScheduler.deleteNotification(trackItemDelete);
+
             }
         }).attachToRecyclerView(recyclerView);
 
@@ -92,14 +100,31 @@ public class ItemListActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == Helper.REQUEST_ADD_ITEM && resultCode == RESULT_OK){
-            TrackItem trackItem = data.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
-            trackItemViewModel.insertItem(trackItem);
-        }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+//        super.onActivityResult(requestCode, resultCode, data);
+//        if(requestCode == Helper.REQUEST_ADD_ITEM && resultCode == RESULT_OK){
+//            TrackItem trackItem = data.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
+//            trackItemViewModel.insertItem(trackItem);
+//        }
+//
+//    }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.settings_menu, menu);
+        return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.settings:
+                Intent settingsIntent = new Intent(ItemListActivity.this, SettingsActivity.class);
+                startActivity(settingsIntent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }

@@ -44,12 +44,19 @@ public class Helper {
         return date;
     }
 
-    public static String getStringFromDate(Date date){
-//        Calendar cal = Calendar.getInstance();
-//        cal.setTime(date);
-//        cal.set(Calendar.HOUR_OF_DAY,9);
-//        date = cal.getTime();
+    public static Date setTime(Date date, int hour, int min, int sec){
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY,hour);
+        cal.set(Calendar.MINUTE,min);
+        cal.set(Calendar.SECOND,sec);
+        cal.set(Calendar.MILLISECOND,00);
+        date = cal.getTime();
+        System.out.println("SET : "+date);
+        return date;
+    }
 
+    public static String getStringFromDate(Date date){
         SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
         return dateFormat.format(date);
     }
@@ -71,22 +78,10 @@ public class Helper {
     }
 
 
-
-
-
-
-
-
-
-
-
-    //Todo icon Inside tool bar
-
-    //todo show expired today, expires tomorrow, expires on Date
-    //todo notification , show proper date
-    //todo if possible implemt settings always notification comes at 9am
-
-
-    //todo using calender you can add substract date https://stackoverflow.com/questions/5894726/how-do-i-do-calendar-arithmetic-with-java-util-date
-
+    //todo sync the settigs time with notification time
+    //todo implement getid on insert from the database
+    //todo replace all strings with values
+    //todo remove the galarry picker
+    //todo save notification time in the preference, by default 9 am
+    //todo remove unwanted comment and add some
 }

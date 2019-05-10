@@ -5,6 +5,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.FileProvider;
+import androidx.lifecycle.ViewModelProviders;
 
 import android.Manifest;
 import android.app.DatePickerDialog;
@@ -41,6 +42,7 @@ import com.cs646.expirytracker.database.TrackItem;
 import com.cs646.expirytracker.helper.FileCompressor;
 import com.cs646.expirytracker.helper.Helper;
 import com.cs646.expirytracker.helper.NotificationScheduler;
+import com.cs646.expirytracker.viewmodel.TrackItemViewModel;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.karumi.dexter.Dexter;
@@ -64,6 +66,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 
 public class EditItemActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -81,6 +84,8 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
     private EditText mItemName;
     private ImageView mItemNameVoice, mItemExpiryDateVoice, mItemReminderVoice, mItemExpiryDateCalendar, mItemReminderCalendar;
     private TextView mItemExpiryDate,mItemReminder;
+    private TrackItem trackItem;
+    private TrackItemViewModel trackItemViewModel;
 
 
     @Override
@@ -92,7 +97,10 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
         setSupportActionBar(toolbar);
         CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.edit_collapsing_toolbar);
 
-        notificationScheduler = new NotificationScheduler(this, ViewItemActivity.class);
+        notificationScheduler = NotificationScheduler.getInstance();
+        notificationScheduler.initScheduler(getBaseContext(), ViewItemActivity.class);
+
+        trackItemViewModel = ViewModelProviders.of(this).get(TrackItemViewModel.class);
 
 
         mAddPhoto = findViewById(R.id.button_add_photo);
@@ -119,7 +127,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
 
 
         Intent intent = getIntent();
-        final TrackItem trackItem = intent.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
+        trackItem = intent.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
 
         if(intent.hasExtra(Helper.EXTRA_TRACK_ITEM)){
             collapsingToolbarLayout.setTitle("Edit Item");
@@ -147,14 +155,20 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
                 promptSpeechInput("Tell me Expiry date",Helper.REQUEST_SPEECH_INPUT_EXPIRY_DATE);
                 break;
             case R.id.edit_item_expiry_date_calendar:
-                setDateFromCalendar(mItemExpiryDate);
+                if(EDIT_MODE)
+                    setDateFromCalendar(mItemExpiryDate,trackItem.getDateExpiry());
+                else
+                    setDateFromCalendar(mItemExpiryDate, new Date());
 
                 break;
             case R.id.edit_item_reminder_voice:
                 promptSpeechInput("Tell me Reminder date",Helper.REQUEST_SPEECH_INPUT_REMINDER_DATE);
                 break;
             case R.id.edit_item_reminder_calendar:
-                setDateFromCalendar(mItemReminder);
+                if(EDIT_MODE)
+                    setDateFromCalendar(mItemReminder,trackItem.getDateReminder());
+                else
+                    setDateFromCalendar(mItemReminder, new Date());
 
                 break;
             case R.id.button_add_photo:
@@ -166,12 +180,13 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
     }
 
 
-
-    private void setDateFromCalendar(final TextView textView){
+    private void setDateFromCalendar(final TextView textView, Date date){
         calendar = Calendar.getInstance();
+        calendar.setTime(date);
         final int day = calendar.get(Calendar.DAY_OF_MONTH);
         final int month = calendar.get(Calendar.MONTH);
         final int year = calendar.get(Calendar.YEAR);
+
 
         datePickerDialog = new DatePickerDialog(EditItemActivity.this, new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -205,12 +220,21 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
 
     private void saveItem(){
         String itemName = mItemName.getText().toString().trim();
-        String itemExpiryDate = mItemExpiryDate.getText().toString().trim();
-        String itemReminderDate = mItemReminder.getText().toString().trim();
+        String itemExpiryDateString = mItemExpiryDate.getText().toString().trim();
+        String itemReminderDateString = mItemReminder.getText().toString().trim();
 
-        if(itemName.isEmpty() || itemExpiryDate.isEmpty() || itemReminderDate.isEmpty()){
+        if(itemName.isEmpty() || itemExpiryDateString.isEmpty() || itemReminderDateString.isEmpty()){
             Helper.showMessage(this, "Please Enter All details");
             return;
+        }
+
+        Date itemExpiryDate = Helper.getDateFromString(itemExpiryDateString);
+        Date itemReminderDate = Helper.getDateFromString(itemReminderDateString);
+        itemReminderDate = Helper.setTime(itemReminderDate,9,0,0);
+        itemExpiryDate = Helper.setTime(itemExpiryDate, 23,59,59);
+
+        if(itemExpiryDate.getTime() < new Date().getTime()){
+            Helper.showMessage(this, "You have already ");
         }
 
 
@@ -221,15 +245,17 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
 
             updatedTrackItem = getIntent().getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
             updatedTrackItem.setName(itemName);
-            updatedTrackItem.setDateExpiry(Helper.getDateFromString(itemExpiryDate));
+            updatedTrackItem.setDateExpiry(itemExpiryDate);
+            updatedTrackItem.setDateReminder(itemReminderDate);
             if(mPhotoFile == null)
                 updatedTrackItem.setItemImagePath(photoFilePath);
             else
                 updatedTrackItem.setItemImagePath(mPhotoFile.toString());
+
+            trackItemViewModel.updateItem(updatedTrackItem);
         }
         else{
 
-            //schedule notification
 
             if(mPhotoFile == null){
                 Helper.showMessage(this, "Please add a photo");
@@ -237,15 +263,18 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
             }
 
             updatedTrackItem = new TrackItem(itemName, new Date(),
-                                            Helper.getDateFromString(itemExpiryDate),
-                                            Helper.getDateFromString(itemReminderDate),
+                                            itemExpiryDate,
+                                            itemReminderDate,
                                             Integer.parseInt("1"),
                     mPhotoFile.toString());
 
 
+            trackItemViewModel.insertItem(updatedTrackItem);
 
         }
 
+
+        //todo schedule notification
         notificationScheduler.scheduleNotification(updatedTrackItem);
 
         data.putExtra(Helper.EXTRA_TRACK_ITEM,updatedTrackItem);
