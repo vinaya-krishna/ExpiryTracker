@@ -1,5 +1,18 @@
 <resources>
     <string name="app_name">ExpiryTracker</string>
+    <string name="item_name_placeholder">Item Name</string>
+    <string name="item_name">Name :</string>
+    <string name="expiry_date">Expiry date :</string>
+    <string name="reminder_date">Reminder date :</string>
+    <string name="notification_time">Notification Time</string>
+    <string name="days_left">Days Left</string>
+    <string name="added_on">Added on</string>
+    <string name="expires_on">Expires on</string>
+    <string name="reminder_on">Reminder date</string>
+    <string name="name_of_item">Name of Item</string>
+    <string name="five_day">5 days reamining</string>
+    <string name="sample_date">May 13, 2019</string>
+    <string name="notification_settings">Notification Settings</string>
 
 
 </resources>

@@ -18,7 +18,7 @@ import java.util.List;
 public interface TrackItemDao {
 
     @Insert
-    void insert(TrackItem tItem);
+    long insert(TrackItem tItem);
 
     @Update
     void update(TrackItem tItem);

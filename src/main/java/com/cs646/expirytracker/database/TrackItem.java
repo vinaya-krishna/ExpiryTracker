@@ -3,6 +3,7 @@ package com.cs646.expirytracker.database;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import androidx.annotation.NonNull;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.room.TypeConverters;
@@ -18,7 +19,9 @@ Create room database for storage, declare all the data items.
 @TypeConverters({DateConverter.class})
 public class TrackItem implements Parcelable {
 
-    @PrimaryKey(autoGenerate = true)
+//    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
+    @NonNull
     private int id;
 
     private String name;
@@ -33,7 +36,8 @@ public class TrackItem implements Parcelable {
 
     private String itemImagePath;
 
-    public TrackItem(String name, Date dateCreation, Date dateExpiry, Date dateReminder, int itemCount, String itemImagePath) {
+    public TrackItem(int id, String name, Date dateCreation, Date dateExpiry, Date dateReminder, int itemCount, String itemImagePath) {
+        this.id = id;
         this.name = name;
         this.dateCreation = dateCreation;
         this.dateExpiry = dateExpiry;

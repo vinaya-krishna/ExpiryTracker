@@ -11,11 +11,11 @@
 
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
         android:layout_margin="8dp"
+        android:text="@string/notification_settings"
 
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        android:text="Notification Settings"/>
+        android:textStyle="bold" />
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -33,16 +33,16 @@
                 android:id="@+id/notification_time_heading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:text="Notification Time"
-                android:layout_marginBottom="8dp"/>
+                android:layout_marginBottom="8dp"
+                android:text="@string/notification_time"
+                android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+
             <TextView
                 android:id="@+id/notification_time_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="09:00 AM"
-                android:textSize="20dp"
-                android:layout_below="@+id/notification_time_heading"/>
+                android:layout_below="@+id/notification_time_heading"
+                android:textSize="20sp" />
 
         </RelativeLayout>
 

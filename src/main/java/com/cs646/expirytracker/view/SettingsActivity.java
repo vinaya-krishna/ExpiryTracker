@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 
 import android.app.TimePickerDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -26,6 +28,15 @@ public class SettingsActivity extends AppCompatActivity implements TimePickerDia
         notificationTime = findViewById(R.id.notification_time);
         notificationTimeText = findViewById(R.id.notification_time_text);
 
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        int hour = sharedPref.getInt("hour", 9);
+        int min = sharedPref.getInt("minute", 0);
+        DecimalFormat formatter = new DecimalFormat("00");
+        if(hour > 12)
+            notificationTimeText.setText(formatter.format(hour%12) + ":" + formatter.format(min) + " PM");
+        else
+            notificationTimeText.setText(formatter.format(hour) + ":" + formatter.format(min) + " AM");
+
         notificationTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -43,6 +54,12 @@ public class SettingsActivity extends AppCompatActivity implements TimePickerDia
             notificationTimeText.setText(formatter.format(hourOfDay%12) + ":" + formatter.format(minute) + " PM");
         else
             notificationTimeText.setText(formatter.format(hourOfDay) + ":" + formatter.format(minute) + " AM");
+
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt("hour", hourOfDay);
+        editor.putInt("minute", minute);
+        editor.commit();
 
     }
 

@@ -14,7 +14,7 @@ import com.cs646.expirytracker.helper.Helper;
 
 import java.util.Date;
 
-@Database(entities = {TrackItem.class}, version = 5)
+@Database(entities = {TrackItem.class}, version = 7)
 public abstract class TrackItemDatabase extends RoomDatabase {
 
     private static TrackItemDatabase instance;

@@ -37,7 +37,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-                app:title="Name of Item"
+                app:title=""
                 app:layout_collapseMode="pin"/>
 
         </com.google.android.material.appbar.CollapsingToolbarLayout>
@@ -73,8 +73,8 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="12dp"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                        android:text="Days Left " />
+                        android:text="@string/days_left"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
                     <TextView
                         android:id="@+id/view_days_left"
                         android:layout_width="match_parent"
@@ -82,6 +82,7 @@
                         android:layout_marginBottom="8dp"
                         android:textSize="20sp"
                         android:paddingLeft="12dp"
+                        android:paddingRight="12dp"
 
                         />
                 </LinearLayout>
@@ -116,14 +117,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="12dp"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                        android:text="Added on" />
+                        android:text="@string/added_on"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
                     <TextView
                         android:id="@+id/view_add_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textSize="20sp"
                         android:paddingLeft="12dp"
+                        android:paddingRight="12dp"
                         android:layout_marginBottom="8dp"/>
                 </LinearLayout>
                 <View
@@ -141,14 +143,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="12dp"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                        android:text="Expires on" />
+                        android:text="@string/expires_on"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
                     <TextView
                         android:id="@+id/view_expiry_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:textSize="20sp"
+                        android:paddingRight="12dp"
                         android:paddingLeft="12dp"
 
                         />
@@ -168,14 +171,15 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:padding="12dp"
-                        android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                        android:text="Reminder Date" />
+                        android:text="@string/reminder_on"
+                        android:textAppearance="@style/TextAppearance.AppCompat.Large" />
                     <TextView
                         android:id="@+id/view_item_reminder_date"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="8dp"
                         android:textSize="20sp"
+                        android:paddingRight="12dp"
                         android:paddingLeft="12dp"
 
                         />

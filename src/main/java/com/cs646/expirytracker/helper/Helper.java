@@ -79,9 +79,8 @@ public class Helper {
 
 
     //todo sync the settigs time with notification time
-    //todo implement getid on insert from the database
     //todo replace all strings with values
-    //todo remove the galarry picker
     //todo save notification time in the preference, by default 9 am
-    //todo remove unwanted comment and add some
+    //todo replace strings in java files getString(R.string.saved_high_score_key)
+
 }

@@ -28,12 +28,13 @@
             android:id="@+id/item_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Name of Item"
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/item_track"
             android:ellipsize="end"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:layout_toRightOf="@id/item_track"
-            android:layout_marginLeft="8dp"
-            android:maxLines="1"/>
+            android:maxLength="20"
+            android:singleLine="true"
+            android:text="@string/name_of_item"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
 
         <TextView
@@ -41,23 +42,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/item_name"
-            android:layout_toRightOf="@id/item_track"
-            android:layout_marginLeft="8dp"
-            android:textStyle="italic"
-            android:text="5 days reamining"/>
+            android:layout_marginStart="8dp"
+            android:layout_toEndOf="@id/item_track"
+            android:text="@string/five_day"
+            android:textStyle="italic" />
 
         <TextView
             android:id="@+id/item_expiry_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="May 13, 2019"
-            android:textStyle="bold"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="8dp"
             android:background="@color/green"
             android:padding="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_centerVertical="true"
+            android:text="@string/sample_date"
             android:textColor="@color/white"
-            android:layout_alignParentEnd="true" />
+            android:textStyle="bold" />
 
 
 

@@ -71,19 +71,19 @@ public class NotificationScheduler {
     }
 
     private long getTimeToNotify(Date reminderDate){
-//        long diffMillSec;
-//        Date dateNow = new Date();
-//        diffMillSec = reminderDate.getTime() - dateNow.getTime();
-//        System.out.println(diffMillSec);
-//        System.out.println(TimeUnit.MILLISECONDS.toDays(Math.abs(diffMillSec)));
-//        if(diffMillSec <= 0){
-//            if(TimeUnit.MILLISECONDS.toDays(Math.abs(diffMillSec)) == 0)
-//                return 2000;
-//            else
-//                return -1;
-//        }
-//        return diffMillSec;
-        return 20000;
+        long diffMillSec;
+        Date dateNow = new Date();
+        diffMillSec = reminderDate.getTime() - dateNow.getTime();
+        System.out.println(diffMillSec);
+        System.out.println(TimeUnit.MILLISECONDS.toDays(Math.abs(diffMillSec)));
+        if(diffMillSec <= 0){
+            if(TimeUnit.MILLISECONDS.toDays(Math.abs(diffMillSec)) == 0)
+                return 2000;
+            else
+                return -1;
+        }
+        return diffMillSec;
+//        return 20000;
 
     }
 

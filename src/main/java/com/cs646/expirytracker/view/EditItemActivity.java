@@ -10,8 +10,10 @@ import androidx.lifecycle.ViewModelProviders;
 import android.Manifest;
 import android.app.DatePickerDialog;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -83,7 +85,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
 
     private EditText mItemName;
     private ImageView mItemNameVoice, mItemExpiryDateVoice, mItemReminderVoice, mItemExpiryDateCalendar, mItemReminderCalendar;
-    private TextView mItemExpiryDate,mItemReminder;
+    private TextView mItemExpiryDate, mItemReminder;
     private TrackItem trackItem;
     private TrackItemViewModel trackItemViewModel;
 
@@ -129,7 +131,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
         Intent intent = getIntent();
         trackItem = intent.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
 
-        if(intent.hasExtra(Helper.EXTRA_TRACK_ITEM)){
+        if (intent.hasExtra(Helper.EXTRA_TRACK_ITEM)) {
             collapsingToolbarLayout.setTitle("Edit Item");
             EDIT_MODE = true;
             mItemName.setText(trackItem.getName());
@@ -137,7 +139,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
             mItemReminder.setText(Helper.getStringFromDate(trackItem.getDateReminder()));
             photoFilePath = trackItem.getItemImagePath();
             Glide.with(this).load(new File(trackItem.getItemImagePath())).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(itemImage);
-        }else{
+        } else {
             collapsingToolbarLayout.setTitle("Add Item");
             EDIT_MODE = false;
         }
@@ -147,32 +149,32 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
     @Override
     public void onClick(View v) {
         System.out.println("Here");
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.edit_item_name_voice:
-                promptSpeechInput("Tell me item name",Helper.REQUEST_SPEECH_INPUT_ITEM_NAME);
+                promptSpeechInput("Tell me item name", Helper.REQUEST_SPEECH_INPUT_ITEM_NAME);
                 break;
             case R.id.edit_item_expiry_date_voice:
-                promptSpeechInput("Tell me Expiry date",Helper.REQUEST_SPEECH_INPUT_EXPIRY_DATE);
+                promptSpeechInput("Tell me Expiry date", Helper.REQUEST_SPEECH_INPUT_EXPIRY_DATE);
                 break;
             case R.id.edit_item_expiry_date_calendar:
-                if(EDIT_MODE)
-                    setDateFromCalendar(mItemExpiryDate,trackItem.getDateExpiry());
+                if (EDIT_MODE)
+                    setDateFromCalendar(mItemExpiryDate, trackItem.getDateExpiry());
                 else
                     setDateFromCalendar(mItemExpiryDate, new Date());
 
                 break;
             case R.id.edit_item_reminder_voice:
-                promptSpeechInput("Tell me Reminder date",Helper.REQUEST_SPEECH_INPUT_REMINDER_DATE);
+                promptSpeechInput("Tell me Reminder date", Helper.REQUEST_SPEECH_INPUT_REMINDER_DATE);
                 break;
             case R.id.edit_item_reminder_calendar:
-                if(EDIT_MODE)
-                    setDateFromCalendar(mItemReminder,trackItem.getDateReminder());
+                if (EDIT_MODE)
+                    setDateFromCalendar(mItemReminder, trackItem.getDateReminder());
                 else
                     setDateFromCalendar(mItemReminder, new Date());
 
                 break;
             case R.id.button_add_photo:
-                selectImage();
+                requestStoragePermission();
 
                 break;
 
@@ -180,7 +182,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
     }
 
 
-    private void setDateFromCalendar(final TextView textView, Date date){
+    private void setDateFromCalendar(final TextView textView, Date date) {
         calendar = Calendar.getInstance();
         calendar.setTime(date);
         final int day = calendar.get(Calendar.DAY_OF_MONTH);
@@ -195,7 +197,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
                 textView.setText(Helper.getStringFromDate(calendar.getTime()));
             }
 
-        }, year,month,day);
+        }, year, month, day);
 
         datePickerDialog.show();
     }
@@ -203,7 +205,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
 
     /**
      * Showing google speech input dialog
-     * */
+     */
     private void promptSpeechInput(String title, int request_code) {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
@@ -214,70 +216,75 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
         try {
             startActivityForResult(intent, request_code);
         } catch (ActivityNotFoundException a) {
-           Helper.showMessage(this,"Sorry! Your device doesn't support speech input");
+            Helper.showMessage(this, "Sorry! Your device doesn't support speech input");
         }
     }
 
-    private void saveItem(){
+    private void saveItem() {
         String itemName = mItemName.getText().toString().trim();
         String itemExpiryDateString = mItemExpiryDate.getText().toString().trim();
         String itemReminderDateString = mItemReminder.getText().toString().trim();
 
-        if(itemName.isEmpty() || itemExpiryDateString.isEmpty() || itemReminderDateString.isEmpty()){
+        if (itemName.isEmpty() || itemExpiryDateString.isEmpty() || itemReminderDateString.isEmpty()) {
             Helper.showMessage(this, "Please Enter All details");
             return;
         }
 
         Date itemExpiryDate = Helper.getDateFromString(itemExpiryDateString);
         Date itemReminderDate = Helper.getDateFromString(itemReminderDateString);
-        itemReminderDate = Helper.setTime(itemReminderDate,9,0,0);
-        itemExpiryDate = Helper.setTime(itemExpiryDate, 23,59,59);
 
-        if(itemExpiryDate.getTime() < new Date().getTime()){
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        int hour = sharedPref.getInt("hour", 9);
+        int min = sharedPref.getInt("minute", 0);
+
+
+        itemReminderDate = Helper.setTime(itemReminderDate, hour, min, 0);
+        itemExpiryDate = Helper.setTime(itemExpiryDate, 23, 59, 59);
+
+        if (itemExpiryDate.getTime() < new Date().getTime()) {
             Helper.showMessage(this, "You have already ");
         }
 
 
-
         Intent data = new Intent();
         TrackItem updatedTrackItem;
-        if(EDIT_MODE){
+        if (EDIT_MODE) {
 
             updatedTrackItem = getIntent().getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
             updatedTrackItem.setName(itemName);
             updatedTrackItem.setDateExpiry(itemExpiryDate);
             updatedTrackItem.setDateReminder(itemReminderDate);
-            if(mPhotoFile == null)
+            if (mPhotoFile == null)
                 updatedTrackItem.setItemImagePath(photoFilePath);
             else
                 updatedTrackItem.setItemImagePath(mPhotoFile.toString());
 
             trackItemViewModel.updateItem(updatedTrackItem);
-        }
-        else{
+        } else {
 
 
-            if(mPhotoFile == null){
+            if (mPhotoFile == null) {
                 Helper.showMessage(this, "Please add a photo");
                 return;
             }
 
-            updatedTrackItem = new TrackItem(itemName, new Date(),
-                                            itemExpiryDate,
-                                            itemReminderDate,
-                                            Integer.parseInt("1"),
+            int id =  (int) new Date().getTime();
+            updatedTrackItem = new TrackItem(id, itemName, new Date(),
+                    itemExpiryDate,
+                    itemReminderDate,
+                    Integer.parseInt("1"),
                     mPhotoFile.toString());
 
 
             trackItemViewModel.insertItem(updatedTrackItem);
-
+            System.out.println("ID is : " + id);
         }
 
 
         //todo schedule notification
         notificationScheduler.scheduleNotification(updatedTrackItem);
 
-        data.putExtra(Helper.EXTRA_TRACK_ITEM,updatedTrackItem);
+        data.putExtra(Helper.EXTRA_TRACK_ITEM, updatedTrackItem);
         setResult(RESULT_OK, data);
         finish();
     }
@@ -290,7 +297,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.save_item:
                 saveItem();
                 return true;
@@ -299,46 +306,22 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    /**
-     * Alert dialog for capture or select from galley
-     */
-    private void selectImage() {
-        final CharSequence[] items = {"Take Photo", "Choose from Library",
-                "Cancel"};
-        AlertDialog.Builder builder = new AlertDialog.Builder(EditItemActivity.this);
-        builder.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (items[which].equals("Take Photo")) {
-                    requestStoragePermission(true);
-                } else if (items[which].equals("Choose from Library")) {
-                    requestStoragePermission(false);
-                } else if (items[which].equals("Cancel")) {
-                    dialog.dismiss();
-                }
-            }
-        });
-
-        builder.show();
-    }
 
     /**
      * Requesting multiple permissions (storage and camera) at once
      * This uses multiple permission model from dexter
      * On permanent denial opens settings dialog
      */
-    private void requestStoragePermission(final boolean isCamera) {
+    private void requestStoragePermission() {
         Dexter.withActivity(this).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA)
                 .withListener(new MultiplePermissionsListener() {
                     @Override
                     public void onPermissionsChecked(MultiplePermissionsReport report) {
                         // check if all permissions are granted
                         if (report.areAllPermissionsGranted()) {
-                            if (isCamera) {
-                               dispatchTakePictureIntent();
-                            } else {
-                                dispatchGalleryIntent();
-                            }
+
+                            dispatchTakePictureIntent();
+
                         }
                         if (report.isAnyPermissionPermanentlyDenied()) {
                             // show alert dialog navigating to Settings
@@ -428,15 +411,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    /**
-     * Select image fro gallery
-     */
-    private void dispatchGalleryIntent() {
-        Intent pickPhoto = new Intent(Intent.ACTION_PICK,
-                MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-        pickPhoto.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivityForResult(pickPhoto, Helper.REQUEST_GALLERY_PHOTO);
-    }
+
 
 
     /**
@@ -475,24 +450,12 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
                             load(mPhotoFile).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(itemImage);
 
                     break;
-                case Helper.REQUEST_GALLERY_PHOTO:
-
-                    Uri selectedImage = data.getData();
-                    try {
-                        mPhotoFile = mCompressor.compressToFile(new File(getRealPathFromUri(selectedImage)));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    Glide.with(EditItemActivity.this).
-                            load(mPhotoFile).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(itemImage);
-
-                    break;
 
                 case Helper.REQUEST_SPEECH_INPUT_ITEM_NAME:
                     ArrayList<String> result_name = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    try{
+                    try {
                         mItemName.setText(capitalizeText(result_name.get(0)));
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         Helper.showMessage(this, e.getMessage());
                     }
 
@@ -500,10 +463,10 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
 
                 case Helper.REQUEST_SPEECH_INPUT_EXPIRY_DATE:
                     ArrayList<String> result_exp_dates = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    try{
+                    try {
 
                         getDateFromSpeech(mItemExpiryDate, result_exp_dates.get(0));
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         Helper.showMessage(this, e.getMessage());
                     }
 
@@ -511,10 +474,10 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
 
                 case Helper.REQUEST_SPEECH_INPUT_REMINDER_DATE:
                     ArrayList<String> result_rem_dates = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    try{
+                    try {
 
                         getDateFromSpeech(mItemReminder, result_rem_dates.get(0));
-                    }catch (Exception e){
+                    } catch (Exception e) {
                         Helper.showMessage(this, e.getMessage());
                     }
 
@@ -524,12 +487,11 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
         }
     }
 
-    public static String capitalizeText(String str)
-    {
+    public static String capitalizeText(String str) {
         return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
-    private void getDateFromSpeech(final TextView textView, String speechString){
+    private void getDateFromSpeech(final TextView textView, String speechString) {
 
         speechString = speechString.replaceAll("\\s", "%20");
 
