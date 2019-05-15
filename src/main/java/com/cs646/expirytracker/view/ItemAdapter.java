@@ -48,16 +48,16 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemHolder> {
         String status;
 
         if(num_of_days == 2){
-            status = "Expiring tomorrow";
+            status = context.getString(R.string.message_expiring_tomorrow);
         }
         else if(num_of_days == 1){
-            status = "Expiring today";
+            status = context.getString(R.string.message_expiring_today);
         }
         else if(num_of_days <= 0){
-            status = "Expired!";
+            status = context.getString(R.string.message_expired);
         }
         else{
-            status = num_of_days + " days remaining";
+            status = num_of_days + context.getString(R.string.message_days_remaining);;
         }
 
         holder.textViewReaminingDays.setText(status);

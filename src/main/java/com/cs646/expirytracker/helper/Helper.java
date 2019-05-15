@@ -20,6 +20,15 @@ public class Helper {
 
     public static final String EXTRA_TRACK_ITEM = "com.cs646.expirytracker.EXTRA_TRACK_ITEM";
 
+    public static final String HOUR = "HOUR";
+    public static final String MINUTE = "MINUTE";
+
+    public static String BASE_URL = "https://api.wit.ai/message?v=20190508&q=";
+
+    public static final int DEFAULT_HOUR = 9;
+    public static final int DEFAULT_MINUTE = 0;
+    public static final int DEFAULT_EXP_HOUR = 23;
+    public static final int DEFAULT_EXP_MINUTE = 59;
 
     public static final int REQUEST_ADD_ITEM = 1;
     public static final int REQUEST_EDIT_ITEM = 2;

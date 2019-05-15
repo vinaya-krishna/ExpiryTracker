@@ -14,5 +14,23 @@
     <string name="sample_date">May 13, 2019</string>
     <string name="notification_settings">Notification Settings</string>
 
+    <string name="edit_item_title">Edit Item</string>
+    <string name="add_item_title">Add Item</string>
+
+    <string name="item_name_speech">Tell me item name</string>
+    <string name="item_exp_date_speech">Tell me Expiry date</string>
+    <string name="item_rem_date_speech">Tell me Reminder date</string>
+
+    <string name="message_enter_all">Please Enter All details</string>
+    <string name="message_item_alread_expired">Item Already Expired</string>
+
+    <string name="message_add_photo">Please add a photo</string>
+
+    <string name="message_expiring_tomorrow">Expiring tomorrow</string>
+    <string name="message_expiring_today">Expiring today</string>
+    <string name="message_expired">Expired!</string>
+    <string name="message_days_remaining"> days remaining</string>
+
+
 
 </resources>

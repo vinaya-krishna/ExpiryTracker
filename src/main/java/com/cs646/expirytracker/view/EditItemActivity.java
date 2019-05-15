@@ -18,6 +18,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.speech.RecognizerIntent;
@@ -132,7 +133,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
         trackItem = intent.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
 
         if (intent.hasExtra(Helper.EXTRA_TRACK_ITEM)) {
-            collapsingToolbarLayout.setTitle("Edit Item");
+            collapsingToolbarLayout.setTitle(getString(R.string.edit_item_title));
             EDIT_MODE = true;
             mItemName.setText(trackItem.getName());
             mItemExpiryDate.setText(Helper.getStringFromDate(trackItem.getDateExpiry()));
@@ -140,7 +141,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
             photoFilePath = trackItem.getItemImagePath();
             Glide.with(this).load(new File(trackItem.getItemImagePath())).apply(new RequestOptions().centerCrop().placeholder(R.drawable.ic_image_placeholder)).into(itemImage);
         } else {
-            collapsingToolbarLayout.setTitle("Add Item");
+            collapsingToolbarLayout.setTitle(getString(R.string.add_item_title));
             EDIT_MODE = false;
         }
     }
@@ -148,13 +149,13 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onClick(View v) {
-        System.out.println("Here");
+
         switch (v.getId()) {
             case R.id.edit_item_name_voice:
-                promptSpeechInput("Tell me item name", Helper.REQUEST_SPEECH_INPUT_ITEM_NAME);
+                promptSpeechInput(getString(R.string.item_name_speech), Helper.REQUEST_SPEECH_INPUT_ITEM_NAME);
                 break;
             case R.id.edit_item_expiry_date_voice:
-                promptSpeechInput("Tell me Expiry date", Helper.REQUEST_SPEECH_INPUT_EXPIRY_DATE);
+                promptSpeechInput(getString(R.string.item_exp_date_speech), Helper.REQUEST_SPEECH_INPUT_EXPIRY_DATE);
                 break;
             case R.id.edit_item_expiry_date_calendar:
                 if (EDIT_MODE)
@@ -164,7 +165,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
 
                 break;
             case R.id.edit_item_reminder_voice:
-                promptSpeechInput("Tell me Reminder date", Helper.REQUEST_SPEECH_INPUT_REMINDER_DATE);
+                promptSpeechInput(getString(R.string.item_rem_date_speech), Helper.REQUEST_SPEECH_INPUT_REMINDER_DATE);
                 break;
             case R.id.edit_item_reminder_calendar:
                 if (EDIT_MODE)
@@ -226,23 +227,24 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
         String itemReminderDateString = mItemReminder.getText().toString().trim();
 
         if (itemName.isEmpty() || itemExpiryDateString.isEmpty() || itemReminderDateString.isEmpty()) {
-            Helper.showMessage(this, "Please Enter All details");
+            Helper.showMessage(this, getString(R.string.message_enter_all));
             return;
         }
 
         Date itemExpiryDate = Helper.getDateFromString(itemExpiryDateString);
         Date itemReminderDate = Helper.getDateFromString(itemReminderDateString);
 
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        int hour = sharedPref.getInt("hour", 9);
-        int min = sharedPref.getInt("minute", 0);
 
-
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        int hour = sharedPref.getInt(Helper.HOUR,Helper.DEFAULT_HOUR);
+        int min = sharedPref.getInt(Helper.MINUTE,Helper.DEFAULT_MINUTE);
         itemReminderDate = Helper.setTime(itemReminderDate, hour, min, 0);
-        itemExpiryDate = Helper.setTime(itemExpiryDate, 23, 59, 59);
+
+
+        itemExpiryDate = Helper.setTime(itemExpiryDate, Helper.DEFAULT_EXP_HOUR, Helper.DEFAULT_EXP_MINUTE, Helper.DEFAULT_EXP_MINUTE);
 
         if (itemExpiryDate.getTime() < new Date().getTime()) {
-            Helper.showMessage(this, "You have already ");
+            Helper.showMessage(this, getString(R.string.message_item_alread_expired));
         }
 
 
@@ -264,7 +266,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
 
 
             if (mPhotoFile == null) {
-                Helper.showMessage(this, "Please add a photo");
+                Helper.showMessage(this, getString(R.string.message_add_photo));
                 return;
             }
 
@@ -277,7 +279,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
 
 
             trackItemViewModel.insertItem(updatedTrackItem);
-            System.out.println("ID is : " + id);
+
         }
 
 
@@ -308,9 +310,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
 
 
     /**
-     * Requesting multiple permissions (storage and camera) at once
-     * This uses multiple permission model from dexter
-     * On permanent denial opens settings dialog
+     * Requesting multiple permissions (storage and camera)
      */
     private void requestStoragePermission() {
         Dexter.withActivity(this).withPermissions(Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA)
@@ -344,8 +344,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
     }
 
     /**
-     * Showing Alert Dialog with Settings option
-     * Navigates user to app settings
+     * Alert Dialog with Settings option
      */
     private void showSettingsDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -495,7 +494,7 @@ public class EditItemActivity extends AppCompatActivity implements View.OnClickL
 
         speechString = speechString.replaceAll("\\s", "%20");
 
-        String url = "https://api.wit.ai/message?v=20190508&q=" + speechString;
+        String url = Helper.BASE_URL + speechString;
         RequestQueue queue = Volley.newRequestQueue(this);
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,

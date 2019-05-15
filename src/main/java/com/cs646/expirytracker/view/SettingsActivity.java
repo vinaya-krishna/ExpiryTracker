@@ -7,19 +7,24 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.cs646.expirytracker.R;
+import com.cs646.expirytracker.helper.Helper;
 import com.cs646.expirytracker.helper.TimePicker;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
 public class SettingsActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener {
 
     RelativeLayout notificationTime;
     TextView notificationTimeText;
+    SharedPreferences mPreferences;
+    SharedPreferences.Editor mEditor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,10 +33,12 @@ public class SettingsActivity extends AppCompatActivity implements TimePickerDia
         notificationTime = findViewById(R.id.notification_time);
         notificationTimeText = findViewById(R.id.notification_time_text);
 
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        int hour = sharedPref.getInt("hour", 9);
-        int min = sharedPref.getInt("minute", 0);
+        ArrayList<Integer> timeData = getSharedPreference();
+
         DecimalFormat formatter = new DecimalFormat("00");
+        int hour = timeData.get(0);
+        int min = timeData.get(1);
+
         if(hour > 12)
             notificationTimeText.setText(formatter.format(hour%12) + ":" + formatter.format(min) + " PM");
         else
@@ -55,12 +62,30 @@ public class SettingsActivity extends AppCompatActivity implements TimePickerDia
         else
             notificationTimeText.setText(formatter.format(hourOfDay) + ":" + formatter.format(minute) + " AM");
 
-        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt("hour", hourOfDay);
-        editor.putInt("minute", minute);
-        editor.commit();
+        saveSharedPreference(hourOfDay, minute);
 
     }
+
+
+    private void saveSharedPreference(int hourOfDay, int minute){
+
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mEditor = mPreferences.edit();
+        mEditor.putInt(Helper.HOUR,hourOfDay);
+        mEditor.putInt(Helper.MINUTE, minute);
+        mEditor.commit();
+
+    }
+
+    private ArrayList<Integer> getSharedPreference(){
+        ArrayList<Integer> timeData = new ArrayList<>();
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        int hour = mPreferences.getInt(Helper.HOUR,9);
+        int min = mPreferences.getInt(Helper.MINUTE,0);
+        timeData.add(hour);
+        timeData.add(min);
+        return timeData;
+    }
+
 
 }

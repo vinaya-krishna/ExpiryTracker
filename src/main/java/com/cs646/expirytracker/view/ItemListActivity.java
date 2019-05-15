@@ -27,11 +27,15 @@ import java.util.List;
 public class ItemListActivity extends AppCompatActivity {
 
     private TrackItemViewModel trackItemViewModel;
+    private NotificationScheduler notificationScheduler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_list);
+
+        notificationScheduler = NotificationScheduler.getInstance();
+        notificationScheduler.initScheduler(getBaseContext(), ViewItemActivity.class);
 
 
         FloatingActionButton buttonAddItem = findViewById(R.id.button_add_item);
