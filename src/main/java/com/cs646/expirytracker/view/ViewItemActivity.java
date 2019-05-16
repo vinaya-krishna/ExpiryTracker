@@ -58,7 +58,6 @@ public class ViewItemActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent editIntent = new Intent(ViewItemActivity.this, EditItemActivity.class);
                 editIntent.putExtra(Helper.EXTRA_TRACK_ITEM,trackItem);
-//                startActivityForResult(editIntent, Helper.REQUEST_EDIT_ITEM);
                 startActivity(editIntent);
             }
         });
@@ -85,16 +84,4 @@ public class ViewItemActivity extends AppCompatActivity {
         }
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//
-//        if(requestCode == Helper.REQUEST_EDIT_ITEM && resultCode == RESULT_OK){
-//            trackItem = data.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
-//            //Update the view
-//            trackItemViewModel.updateItem(trackItem);
-//            //Update in the ViewModel
-//            updateView(trackItem);
-//        }
-//    }
 }

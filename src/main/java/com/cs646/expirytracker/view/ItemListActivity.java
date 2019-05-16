@@ -104,15 +104,6 @@ public class ItemListActivity extends AppCompatActivity {
 
     }
 
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if(requestCode == Helper.REQUEST_ADD_ITEM && resultCode == RESULT_OK){
-//            TrackItem trackItem = data.getParcelableExtra(Helper.EXTRA_TRACK_ITEM);
-//            trackItemViewModel.insertItem(trackItem);
-//        }
-//
-//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
